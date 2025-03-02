@@ -1,0 +1,68 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  Build-Windows-MSVC:
+    strategy:
+      matrix:
+        platform: [x64, x86, ARM64]
+        config: [Debug, Release]
+      fail-fast: false
+    runs-on: windows-latest
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@main
+      with:
+          submodules: recursive
+    - name: Prepare MSBuild
+      uses: microsoft/setup-msbuild@main
+    - name: Build
+      working-directory: ${{github.workspace}}
+      run: msbuild ".\VSProject\KNSoft.FirmwareSpec.sln" /restore /m /p:Configuration=${{matrix.config}} /p:Platform=${{matrix.platform}} /p:RestorePackagesConfig=true
+    - name: Run sample programs
+      if: ${{ matrix.platform == 'x64' || matrix.platform == 'x86' }}
+      working-directory: ${{github.workspace}}
+      run: |
+        & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\SmbiosDecode.exe >.\SmbiosDecode.txt
+        Get-Content .\SmbiosDecode.txt
+    - name: Archive sample programs and outputs
+      if: ${{ matrix.platform == 'x64' || matrix.platform == 'x86' }}
+      uses: actions/upload-artifact@main
+      with:
+        name: KNSoft.FirmwareSpec-Windows-MSVC-${{matrix.platform}}-${{matrix.config}}-${{github.sha}}
+        path: |
+          .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\SmbiosDecode.exe
+          .\SmbiosDecode.txt
+
+  Build-Linux-GCC:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+    - name: Source checkout
+      uses: actions/checkout@main
+      with:
+          submodules: recursive
+    - name: Build
+      working-directory: ${{github.workspace}}
+      run: gcc -fdiagnostics-color=always -D_LINUX -g ./SmbiosDecode.c -o SmbiosDecode
+    - name: Run sample programs
+      working-directory: ${{github.workspace}}
+      run: |
+        sudo ./SmbiosDecode >./SmbiosDecode.txt
+        cat ./SmbiosDecode.txt
+    - name: Archive sample programs and outputs
+      uses: actions/upload-artifact@main
+      with:
+        name: KNSoft.FirmwareSpec-Linux-GCC-${{github.sha}}
+        path: |
+          ./SmbiosDecode
+          ./SmbiosDecode.txt

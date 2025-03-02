@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+  <metadata>
+    <id>KNSoft.FirmwareSpec</id>
+    <version>1.0.0-beta</version>
+    <title>KNSoft.FirmwareSpec</title>
+    <authors>KNSoft</authors>
+    <projectUrl>https://github.com/KNSoft/KNSoft.FirmwareSpec</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <readme>README.md</readme>
+    <description>C/C++ definitions of multiple firmware specifications with corresponding type information</description>
+    <tags>native firmware smbios dmidecode</tags>
+    <repository type="git" url="https://github.com/KNSoft/KNSoft.FirmwareSpec" />
+  </metadata>
+  <files>
+    <file src="README.md" target="" />
+    <file src="KNSoft.FirmwareSpec.targets" target="build\" />
+    <file src="SMBIOS.h" target="build\Include\KNSoft\FirmwareSpec\" />
+    <file src="SMBIOS.TypeInfo.h" target="build\Include\KNSoft\FirmwareSpec\" />
+    <file src="SMBIOS.TypeInfo.inl" target="build\Include\KNSoft\FirmwareSpec\" />
+  </files>
+</package>

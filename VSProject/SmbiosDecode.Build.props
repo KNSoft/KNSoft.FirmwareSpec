@@ -1,0 +1,7 @@
+<Project>
+    <ItemDefinitionGroup>
+        <ClCompile>
+            <PreprocessorDefinitions>_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+        </ClCompile>
+    </ItemDefinitionGroup>
+</Project>

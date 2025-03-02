@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmbiosDecode", "SmbiosDecode.vcxproj", "{28468506-07F8-4CBB-8D72-1EE9D6E045C8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3} = {9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeInfoGenerator", "..\TypeInfoGenerator\TypeInfoGenerator.csproj", "{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM64 = Release|ARM64
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Debug|ARM64.Build.0 = Debug|ARM64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Debug|x64.ActiveCfg = Debug|x64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Debug|x64.Build.0 = Debug|x64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Debug|x86.ActiveCfg = Debug|Win32
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Debug|x86.Build.0 = Debug|Win32
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Release|ARM64.ActiveCfg = Release|ARM64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Release|ARM64.Build.0 = Release|ARM64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Release|x64.ActiveCfg = Release|x64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Release|x64.Build.0 = Release|x64
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Release|x86.ActiveCfg = Release|Win32
+		{28468506-07F8-4CBB-8D72-1EE9D6E045C8}.Release|x86.Build.0 = Release|Win32
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Debug|x64.Build.0 = Debug|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Debug|x86.Build.0 = Debug|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Release|ARM64.Build.0 = Release|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Release|x64.ActiveCfg = Release|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Release|x64.Build.0 = Release|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Release|x86.ActiveCfg = Release|Any CPU
+		{9021B9D5-9198-4F88-A4A1-E6763BFFB3C3}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6FC9A2F-1E93-42FD-BE99-FB0BD59C7B36}
+	EndGlobalSection
+EndGlobal

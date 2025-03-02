@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <BuildDependsOn>$(BuildDependsOn);_GenerateSmbiosTypeInfo</BuildDependsOn>
+  </PropertyGroup>
+  <Target
+    Name="_GenerateSmbiosTypeInfo"
+    BeforeTargets="Midl"
+    AfterTargets="PreBuildEvent"
+    Inputs="$(MSBuildProjectDirectory)..\SMBIOS.h"
+    Outputs="$(MSBuildProjectDirectory)..\SMBIOS.TypeInfo.h">
+
+    <Message Importance = "High"
+             Text       = "Generating SMBIOS type information for SMBIOS.h ..." />
+    <Exec Command="$(MSBuildProjectDirectory)\..\TypeInfoGenerator\bin\$(Configuration)\net9.0\TypeInfoGenerator.exe &quot;$(MSBuildProjectDirectory)\..\SMBIOS.h&quot;" />
+  </Target>
+</Project>
