@@ -13,7 +13,7 @@
 | :- | :- | :- | :- |
 | [SMBIOS 参考规范](https://www.dmtf.org/standards/smbios) | [SMBIOS.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.h) | [SMBIOS.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.TypeInfo.h) | [SmbiosDecode](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SmbiosDecode.c) |
 | [ACPI规范](https://uefi.org/specifications) | (TODO) | - | - |
-| CPUID | (WIP) | - | - |
+| CPUID | [CPUID.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CPUID.h) | (WIP) | (WIP) |
 
 [TypeInfoGenerator](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/TypeInfoGenerator)根据对应的规范定义（如[SMBIOS.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.h)）生成类型信息（如[SMBIOS.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.TypeInfo.h)），类型信息对于像`dmidecode`这样的工具用以解析各个结构体成员十分有用。
 
@@ -25,6 +25,8 @@ NuGet包[KNSoft.FirmwareSpec](https://www.nuget.org/packages/KNSoft.FirmwareSpec
 ```C
 #include <KNSoft/FirmwareSpec/SMBIOS.h>             // SMBIOS参考标准
 #include <KNSoft/FirmwareSpec/SMBIOS.TypeInfo.h>    // SMBIOS参考标准的类型信息
+
+#include <KNSoft/FirmwareSpec/CPUID.h>              // CPUID
 ```
 
 我们始终保持定义更新，支持使用宏（如`SMBIOS_VERSION`）控制版本，更多信息参考对应的头文件。

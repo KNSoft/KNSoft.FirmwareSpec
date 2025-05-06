@@ -13,7 +13,7 @@
 | :- | :- | :- | :- |
 | [SMBIOS reference specification](https://www.dmtf.org/standards/smbios) | [SMBIOS.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.h) | [SMBIOS.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.TypeInfo.h) | [SmbiosDecode](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SmbiosDecode.c) |
 | [ACPI Specification](https://uefi.org/specifications) | (TODO) | - | - |
-| CPUID | (WIP) | - | - |
+| CPUID | [CPUID.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CPUID.h) | (WIP) | (WIP) |
 
 [TypeInfoGenerator](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/TypeInfoGenerator) generates type information (e.g. [SMBIOS.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.TypeInfo.h)) according to the corresponding specification definitions (e.g. [SMBIOS.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.h)), type information is very useful for tools like `dmidecode` to resolve each of structure fields.
 
@@ -25,6 +25,8 @@ NuGet package [KNSoft.FirmwareSpec](https://www.nuget.org/packages/KNSoft.Firmwa
 ```C
 #include <KNSoft/FirmwareSpec/SMBIOS.h>             // SMBIOS reference specification
 #include <KNSoft/FirmwareSpec/SMBIOS.TypeInfo.h>    // Type information of SMBIOS reference specification
+
+#include <KNSoft/FirmwareSpec/CPUID.h>              // CPUID
 ```
 
 We always keep our definitions up-to-date, support version control by using macro (e.g. `SMBIOS_VERSION`), see corresponding header for more information.
