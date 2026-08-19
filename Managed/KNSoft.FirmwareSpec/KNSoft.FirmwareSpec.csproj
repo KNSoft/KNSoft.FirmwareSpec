@@ -8,7 +8,7 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>KNSoft.FirmwareSpec</PackageId>
-    <Version>1.0.0-beta</Version>
+    <Version>1.0.1-beta</Version>
     <Authors>KNSoft</Authors>
     <Description>Safe C, C++, and .NET parsers for SMBIOS, ACPI, and CPUID data.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

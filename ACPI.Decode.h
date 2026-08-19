@@ -53,9 +53,17 @@ AcpiValidateRsdp(
     }
     if (Value->Revision >= 2)
     {
-        if (Value->Length < sizeof(*Value) || FirmwareBuffer_Get(Buffer, 0, Value->Length) == NULL)
+        if (FirmwareBuffer_Get(Buffer, 0, offsetof(ACPI_ROOT_SYSTEM_DESCRIPTION_POINTER, XsdtAddress)) == NULL)
+        {
+            return FirmwareDecodeTruncatedHeader;
+        }
+        if (Value->Length < sizeof(*Value))
         {
             return FirmwareDecodeInvalidLength;
+        }
+        if (FirmwareBuffer_Get(Buffer, 0, Value->Length) == NULL)
+        {
+            return FirmwareDecodeTruncatedData;
         }
         if (!FirmwareChecksum8(Value, Value->Length))
         {

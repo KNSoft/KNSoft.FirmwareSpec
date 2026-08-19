@@ -9,7 +9,9 @@
     <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\FirmwareSpecTest.c" />
+    <ClCompile Include="..\FirmwareSpecTest.c">
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ACPI.Decode.h" />
@@ -40,6 +42,8 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <SDLCheck>true</SDLCheck>
+      <!-- Public C firmware definitions intentionally use flexible array members; this test compiles them as C++. -->
+      <DisableSpecificWarnings>4200;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>

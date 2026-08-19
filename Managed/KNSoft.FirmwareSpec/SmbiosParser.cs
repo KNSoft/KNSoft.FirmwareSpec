@@ -46,6 +46,12 @@ public sealed class SmbiosStructure
     /// <summary>Gets a stable English name for the structure type.</summary>
     public string TypeName => SmbiosParser.GetTypeName(Type);
 
+    /// <summary>Gets the standard metadata for the structure type, if known.</summary>
+    public SmbiosTypeInfo? TypeInfo => SmbiosParser.GetTypeInfo(Type);
+
+    /// <summary>Gets the formatted fields defined for the structure type.</summary>
+    public IReadOnlyList<SmbiosFieldInfo> Fields => SmbiosParser.GetFields(Type);
+
     /// <summary>Reads a little-endian unsigned formatted field without throwing for an invalid range.</summary>
     public bool TryReadUnsigned(int offset, int size, out ulong value)
     {
@@ -65,6 +71,27 @@ public sealed class SmbiosStructure
             _ => 0,
         };
         return size is 1 or 2 or 4 or 8;
+    }
+
+    /// <summary>Reads an unsigned or bit field described by SMBIOS metadata.</summary>
+    public bool TryReadUnsigned(SmbiosFieldInfo field, out ulong value)
+    {
+        value = 0;
+        if (field is null ||
+            field.DataType is not (SmbiosDataType.UnsignedInteger or SmbiosDataType.Bit or SmbiosDataType.Enum) ||
+            !TryReadUnsigned(field.Offset, field.Size, out value))
+        {
+            return false;
+        }
+        if (field.IsBitField)
+        {
+            value >>= field.BitOffset;
+            if (field.BitCount != 64)
+            {
+                value &= ulong.MaxValue >> (64 - field.BitCount);
+            }
+        }
+        return true;
     }
 
     /// <summary>Resolves a one-based SMBIOS string index. Index zero means no string.</summary>
@@ -98,6 +125,15 @@ public sealed class SmbiosStructure
         }
         return false;
     }
+
+    /// <summary>Resolves a string field described by SMBIOS metadata.</summary>
+    public bool TryGetString(SmbiosFieldInfo field, out string? value)
+    {
+        value = null;
+        return field is not null && field.DataType == SmbiosDataType.StringIndex && !field.IsBitField &&
+            field.Size == 1 &&
+            TryReadUnsigned(field.Offset, field.Size, out ulong index) && TryGetString((byte)index, out value);
+    }
 }
 
 /// <summary>A validated SMBIOS structure table.</summary>
@@ -125,6 +161,9 @@ public static class SmbiosParser
 {
     private const int RawHeaderSize = 8;
     private const int StructureHeaderSize = 4;
+
+    /// <summary>Gets metadata for all standard SMBIOS structure types known to this library.</summary>
+    public static IReadOnlyList<SmbiosTypeInfo> Types => SmbiosMetadata.All;
 
     /// <summary>Parses the RAW_SMBIOS_DATA buffer returned by GetSystemFirmwareTable.</summary>
     public static FirmwareDecodeStatus TryParseWindowsRaw(ReadOnlyMemory<byte> data, out SmbiosTable? table)
@@ -202,60 +241,15 @@ public static class SmbiosParser
         return FirmwareDecodeStatus.Success;
     }
 
-    /// <summary>Gets a stable English name for a standard SMBIOS structure type.</summary>
-    public static string GetTypeName(byte type) => type switch
-    {
-        0 => "BIOS Information",
-        1 => "System Information",
-        2 => "Baseboard Information",
-        3 => "System Enclosure",
-        4 => "Processor Information",
-        5 => "Memory Controller Information",
-        6 => "Memory Module Information",
-        7 => "Cache Information",
-        8 => "Port Connector Information",
-        9 => "System Slots",
-        10 => "On Board Devices Information",
-        11 => "OEM Strings",
-        12 => "System Configuration Options",
-        13 => "BIOS Language Information",
-        14 => "Group Associations",
-        15 => "System Event Log",
-        16 => "Physical Memory Array",
-        17 => "Memory Device",
-        18 => "32-Bit Memory Error Information",
-        19 => "Memory Array Mapped Address",
-        20 => "Memory Device Mapped Address",
-        21 => "Built-in Pointing Device",
-        22 => "Portable Battery",
-        23 => "System Reset",
-        24 => "Hardware Security",
-        25 => "System Power Controls",
-        26 => "Voltage Probe",
-        27 => "Cooling Device",
-        28 => "Temperature Probe",
-        29 => "Electrical Current Probe",
-        30 => "Out-of-Band Remote Access",
-        31 => "Boot Integrity Services Entry Point",
-        32 => "System Boot Information",
-        33 => "64-Bit Memory Error Information",
-        34 => "Management Device",
-        35 => "Management Device Component",
-        36 => "Management Device Threshold Data",
-        37 => "Memory Channel",
-        38 => "IPMI Device Information",
-        39 => "System Power Supply",
-        40 => "Additional Information",
-        41 => "Onboard Devices Extended Information",
-        42 => "Management Controller Host Interface",
-        43 => "TPM Device",
-        44 => "Processor Additional Information",
-        45 => "Firmware Inventory Information",
-        46 => "String Property",
-        126 => "Inactive",
-        127 => "End-of-Table",
-        _ => "OEM or Unknown",
-    };
+    /// <summary>Gets metadata for a standard SMBIOS structure type, if known.</summary>
+    public static SmbiosTypeInfo? GetTypeInfo(byte type) => SmbiosMetadata.ByType[type];
+
+    /// <summary>Gets the formatted fields for a standard SMBIOS structure type.</summary>
+    public static IReadOnlyList<SmbiosFieldInfo> GetFields(byte type) =>
+        GetTypeInfo(type)?.Fields ?? Array.Empty<SmbiosFieldInfo>();
+
+    /// <summary>Gets a stable English name for an SMBIOS structure type.</summary>
+    public static string GetTypeName(byte type) => GetTypeInfo(type)?.Name ?? "OEM or Unknown";
 
     private static int FindStringSetEnd(ReadOnlySpan<byte> data, int start)
     {
