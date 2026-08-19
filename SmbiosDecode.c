@@ -261,7 +261,7 @@ PrintSmbiosTable(
     /* Print table header */
     if (TypeInfo != NULL)
     {
-        printf("[Type %hhu: %s]\n", Table->Header.Type, TypeInfo->Name);
+        printf("[Type %hhu: %s]\n", Table->Header.Type, (const char*)TypeInfo->Name);
     } else
     {
         printf("[Type %hhu (Unrecognized)]\n", Table->Header.Type);
@@ -300,13 +300,13 @@ PrintSmbiosTable(
                 printf("%02hhu [%c] %s",
                        (BYTE)TypeInfo->Fields[i].Offset,
                        (BitFieldValue & ((QWORD)1 << TypeInfo->Fields[i].Offset)) ? 'x' : ' ',
-                       TypeInfo->Fields[i].Name);
+                       (const char*)TypeInfo->Fields[i].Name);
             } else if (TypeInfo->Fields[i].Type == SmbiosDataTypeUInt || TypeInfo->Fields[i].Type == SmbiosDataTypeEnum)
             {
                 printf("%02hhu:%02hhu %s: ",
                        (BYTE)TypeInfo->Fields[i].Offset,
                        (BYTE)TypeInfo->Fields[i].Offset + TypeInfo->Fields[i].Size - 1,
-                       TypeInfo->Fields[i].Name);
+                       (const char*)TypeInfo->Fields[i].Name);
                 Value = FirmwareExtractBits(BitFieldValue,
                                             (BYTE)TypeInfo->Fields[i].Offset,
                                             TypeInfo->Fields[i].Size);
@@ -318,7 +318,7 @@ PrintSmbiosTable(
                 break;
             }
             BitFieldSize = 0;
-            printf("0x%04hX %s: ", TypeInfo->Fields[i].Offset, TypeInfo->Fields[i].Name);
+            printf("0x%04hX %s: ", TypeInfo->Fields[i].Offset, (const char*)TypeInfo->Fields[i].Name);
         }
 
         if (TypeInfo->Fields[i].Type == SmbiosDataTypeString && TypeInfo->Fields[i].Size == sizeof(BYTE))
@@ -359,7 +359,7 @@ PrintSmbiosTable(
                 {
                     if (TypeInfo->Fields[i].Enum.Values[j].Value == Value)
                     {
-                        printf(" (%s)", TypeInfo->Fields[i].Enum.Values[j].Name);
+                        printf(" (%s)", (const char*)TypeInfo->Fields[i].Enum.Values[j].Name);
                         break;
                     }
                 }

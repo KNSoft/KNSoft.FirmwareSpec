@@ -9,7 +9,7 @@ PrintFeature(
     void* Context)
 {
     (void)Context;
-    printf("  %s\n", Feature->Name);
+    printf("  %s\n", (const char*)Feature->Name);
     return true;
 }
 
