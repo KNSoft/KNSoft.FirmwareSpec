@@ -117,9 +117,9 @@ CpuidVisitFeatures(
     uint32_t CurrentSubLeaf = UINT32_MAX;
     uint32_t MaximumLeaf;
     uint32_t MaximumStructuredSubLeaf = UINT32_MAX;
-    uint32_t Registers[4];
     char Vendor[13];
     size_t Index;
+    bool HasInfo = false;
     FIRMWARE_DECODE_STATUS Status;
 
     if (Visitor == NULL)
@@ -156,21 +156,18 @@ CpuidVisitFeatures(
                 continue;
             }
         }
-        if (Feature->Leaf != CurrentLeaf || Feature->SubLeaf != CurrentSubLeaf)
+        if (!HasInfo || Feature->Leaf != CurrentLeaf || Feature->SubLeaf != CurrentSubLeaf)
         {
             Status = CpuidExecute(Feature->Leaf, Feature->SubLeaf, &Info);
             if (Status != FirmwareDecodeSuccess)
             {
                 return Status;
             }
-            Registers[0] = (uint32_t)Info.Registers[0];
-            Registers[1] = (uint32_t)Info.Registers[1];
-            Registers[2] = (uint32_t)Info.Registers[2];
-            Registers[3] = (uint32_t)Info.Registers[3];
             CurrentLeaf = Feature->Leaf;
             CurrentSubLeaf = Feature->SubLeaf;
+            HasInfo = true;
         }
-        if ((Registers[Feature->Register] & (UINT32_C(1) << Feature->Bit)) != 0 &&
+        if (((uint32_t)Info.Registers[Feature->Register] & (UINT32_C(1) << Feature->Bit)) != 0 &&
             !Visitor(Feature, Context))
         {
             break;
