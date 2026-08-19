@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>KNSoft.FirmwareSpec</PackageId>
+    <Version>1.0.0-beta</Version>
+    <Authors>KNSoft</Authors>
+    <Description>Safe C, C++, and .NET parsers for SMBIOS, ACPI, and CPUID data.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>firmware;smbios;acpi;cpuid</PackageTags>
+    <RepositoryUrl>https://github.com/KNSoft/KNSoft.FirmwareSpec</RepositoryUrl>
+    <PackageOutputPath>..\..\Artifacts</PackageOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\KNSoft.FirmwareSpec.targets" Pack="true" PackagePath="build\" />
+    <None Include="..\..\FirmwareDecode.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\SMBIOS.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\SMBIOS.TypeInfo.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\SMBIOS.TypeInfo.inl" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\SMBIOS.Decode.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\ACPI.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\ACPI.TypeInfo.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\ACPI.Decode.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\CPUID.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\CPUID.TypeInfo.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+    <None Include="..\..\CPUID.Decode.h" Pack="true" PackagePath="build\Include\KNSoft\FirmwareSpec\" />
+  </ItemGroup>
+</Project>

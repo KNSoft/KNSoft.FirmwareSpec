@@ -10,12 +10,14 @@
     <license type="expression">MIT</license>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
     <readme>README.md</readme>
-    <description>C/C++ definitions of multiple firmware specifications with corresponding type information</description>
-    <tags>native firmware smbios acpi cpuid dmidecode</tags>
+    <description>Safe C, C++, and .NET parsers for SMBIOS, ACPI, and CPUID data</description>
+    <tags>native managed firmware smbios acpi cpuid dmidecode</tags>
     <repository type="git" url="https://github.com/KNSoft/KNSoft.FirmwareSpec" />
   </metadata>
   <files>
     <file src="README.md" target="" />
+    <file src="Managed\KNSoft.FirmwareSpec\bin\Release\net10.0\KNSoft.FirmwareSpec.dll" target="lib\net10.0\" />
+    <file src="Managed\KNSoft.FirmwareSpec\bin\Release\net10.0\KNSoft.FirmwareSpec.xml" target="lib\net10.0\" />
     <file src="KNSoft.FirmwareSpec.targets" target="build\" />
     <file src="FirmwareDecode.h" target="build\Include\KNSoft\FirmwareSpec\" />
     <file src="SMBIOS.h" target="build\Include\KNSoft\FirmwareSpec\" />

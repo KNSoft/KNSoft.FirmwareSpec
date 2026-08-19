@@ -75,3 +75,12 @@ cpp_space_pointer_reference_alignment = ignore
 cpp_space_around_ternary_operator = insert
 cpp_use_unreal_engine_macro_formatting = true
 cpp_wrap_preserve_blocks = all_one_line_scopes
+
+[*.cs]
+
+charset = utf-8-bom
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+insert_final_newline = true
+max_line_length = 120
