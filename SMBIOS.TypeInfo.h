@@ -79,7 +79,7 @@ SMBIOS_FIELD_TYPE_INFO SmbiosType0FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_UINT(0, "Embedded Controller Firmware Minor Release", ECFirmwareMinorRelease),
     SMBIOS_DEFINE_FIELD_UINT(0, "Extended Firmware ROM Size", ExtendedROMSize.Value),
     SMBIOS_DEFINE_BIT_FIELD("Size", 0, 14, SmbiosDataTypeUInt),
-    SMBIOS_DEFINE_BIT_FIELD("Unit", 14, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosPlatformFirmwareExtendedRomsizeUnitEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Unit", 14, 2, SmbiosPlatformFirmwareExtendedRomsizeUnitEnum),
 };
 
 SMBIOS_TYPEINFO_SELECTANY
@@ -207,7 +207,7 @@ SMBIOS_TYPEINFO_SELECTANY
 SMBIOS_FIELD_TYPE_INFO SmbiosType3FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_STRING(3, "Manufacturer", Manufacturer),
     SMBIOS_DEFINE_FIELD_UINT(3, "Type", Type.Value),
-    SMBIOS_DEFINE_BIT_FIELD("Type", 0, 7, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosSystemEnclosureOrChassisTypeEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Type", 0, 7, SmbiosSystemEnclosureOrChassisTypeEnum),
     SMBIOS_DEFINE_FIELD_BIT("Chassis lock is present", 7),
     SMBIOS_DEFINE_FIELD_STRING(3, "Version", Version),
     SMBIOS_DEFINE_FIELD_STRING(3, "Serial Number", SerialNumber),
@@ -607,7 +607,7 @@ SMBIOS_FIELD_TYPE_INFO SmbiosType4FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_UINT(4, "Max Speed", MaxSpeed),
     SMBIOS_DEFINE_FIELD_UINT(4, "Current Speed", CurrentSpeed),
     SMBIOS_DEFINE_FIELD_UINT(4, "Status", Status.Value),
-    SMBIOS_DEFINE_BIT_FIELD("CPU Status", 0, 3, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosProcessorCpuStatusEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("CPU Status", 0, 3, SmbiosProcessorCpuStatusEnum),
     SMBIOS_DEFINE_BIT_FIELD("Reserved", 3, 3, SmbiosDataTypeUInt),
     SMBIOS_DEFINE_FIELD_BIT("CPU Socket Populated", 6),
     SMBIOS_DEFINE_FIELD_BIT("Reserved", 7),
@@ -809,9 +809,9 @@ SMBIOS_FIELD_TYPE_INFO SmbiosType7FieldInfo[] = {
     SMBIOS_DEFINE_BIT_FIELD("Level", 0, 3, SmbiosDataTypeUInt),
     SMBIOS_DEFINE_FIELD_BIT("Socketed", 3),
     SMBIOS_DEFINE_FIELD_BIT("Reserved", 4),
-    SMBIOS_DEFINE_BIT_FIELD("Location", 5, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosCacheLocationEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Location", 5, 2, SmbiosCacheLocationEnum),
     SMBIOS_DEFINE_FIELD_BIT("Enabled", 7),
-    SMBIOS_DEFINE_BIT_FIELD("Operational Mode", 8, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosCacheOperationalModeEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Operational Mode", 8, 2, SmbiosCacheOperationalModeEnum),
     SMBIOS_DEFINE_BIT_FIELD("Reserved", 10, 6, SmbiosDataTypeUInt),
     SMBIOS_DEFINE_FIELD_UINT(7, "Maximum Cache Size", MaximumCacheSize.Value),
     SMBIOS_CACHE_SIZE_FIELDS,
@@ -1481,8 +1481,8 @@ SMBIOS_TYPEINFO_SELECTANY
 SMBIOS_FIELD_TYPE_INFO SmbiosType23FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_UINT(23, "Capabilities", Capabilities.Value),
     SMBIOS_DEFINE_FIELD_BIT("Status", 0),
-    SMBIOS_DEFINE_BIT_FIELD("Boot Option", 1, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosSystemResetBootOptionEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Boot Option on Limit", 3, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosSystemResetBootOptionEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Boot Option", 1, 2, SmbiosSystemResetBootOptionEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Boot Option on Limit", 3, 2, SmbiosSystemResetBootOptionEnum),
     SMBIOS_DEFINE_FIELD_BIT("System contains a watchdog timer", 5),
     SMBIOS_DEFINE_BIT_FIELD("Reserved", 6, 2, SmbiosDataTypeUInt),
     SMBIOS_DEFINE_FIELD_UINT(23, "Reset Count", ResetCount),
@@ -1502,10 +1502,10 @@ SMBIOS_FIELD_ENUM SmbiosHardwareSecuritySettingsStatusEnum[] = {
 SMBIOS_TYPEINFO_SELECTANY
 SMBIOS_FIELD_TYPE_INFO SmbiosType24FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_UINT(24, "Hardware Security Settings", Settings.Value),
-    SMBIOS_DEFINE_BIT_FIELD("Panel Reset Status", 0, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosHardwareSecuritySettingsStatusEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Password Status", 2, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosHardwareSecuritySettingsStatusEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Password Status", 4, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosHardwareSecuritySettingsStatusEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Password Status", 6, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosHardwareSecuritySettingsStatusEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Panel Reset Status", 0, 2, SmbiosHardwareSecuritySettingsStatusEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Password Status", 2, 2, SmbiosHardwareSecuritySettingsStatusEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Password Status", 4, 2, SmbiosHardwareSecuritySettingsStatusEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Password Status", 6, 2, SmbiosHardwareSecuritySettingsStatusEnum),
 };
 
 SMBIOS_TYPEINFO_SELECTANY
@@ -1546,8 +1546,8 @@ SMBIOS_TYPEINFO_SELECTANY
 SMBIOS_FIELD_TYPE_INFO SmbiosType26FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_STRING(26, "Description", Description),
     SMBIOS_DEFINE_FIELD_UINT(26, "Location and Status", LocationAndStatus.Value),
-    SMBIOS_DEFINE_BIT_FIELD("Location", 0, 5, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosVoltageProbeLocationEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Status", 5, 3, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosProbeStatusEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Location", 0, 5, SmbiosVoltageProbeLocationEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Status", 5, 3, SmbiosProbeStatusEnum),
     SMBIOS_DEFINE_FIELD_UINT(26, "Maximum Value", MaximumValue),
     SMBIOS_DEFINE_FIELD_UINT(26, "Minimum Value", MinimumValue),
     SMBIOS_DEFINE_FIELD_UINT(26, "Resolution", Resolution),
@@ -1576,8 +1576,8 @@ SMBIOS_TYPEINFO_SELECTANY
 SMBIOS_FIELD_TYPE_INFO SmbiosType27FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_UINT(27, "Temperature Probe Handle", TemperatureProbeHandle),
     SMBIOS_DEFINE_FIELD_UINT(27, "Device Type and Status", DeviceTypeAndStatus.Value),
-    SMBIOS_DEFINE_BIT_FIELD("Device Type", 0, 5, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosCoolingDeviceTypeEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Status", 5, 3, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosProbeStatusEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Device Type", 0, 5, SmbiosCoolingDeviceTypeEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Status", 5, 3, SmbiosProbeStatusEnum),
     SMBIOS_DEFINE_FIELD_UINT(27, "Cooling Unit Group", CoolingUnitGroup),
     SMBIOS_DEFINE_FIELD_UINT(27, "OEM-defined", OEMDefined),
     SMBIOS_DEFINE_FIELD_UINT(27, "Nominal Speed", NominalSpeed),
@@ -1604,7 +1604,7 @@ SMBIOS_FIELD_TYPE_INFO SmbiosType29FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_STRING(29, "Description", Description),
     SMBIOS_DEFINE_FIELD_UINT(29, "Location and Status", LocationAndStatus.Value),
     SMBIOS_DEFINE_BIT_FIELD("Location", 0, 5, SmbiosDataTypeUInt),
-    SMBIOS_DEFINE_BIT_FIELD("Status", 5, 3, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosProbeStatusEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Status", 5, 3, SmbiosProbeStatusEnum),
     SMBIOS_DEFINE_FIELD_UINT(29, "Maximum Value", MaximumValue),
     SMBIOS_DEFINE_FIELD_UINT(29, "Minimum Value", MinimumValue),
     SMBIOS_DEFINE_FIELD_UINT(29, "Resolution", Resolution),
@@ -1756,7 +1756,7 @@ SMBIOS_FIELD_TYPE_INFO SmbiosType38FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_BIT("Interrupt Info", 3),
     SMBIOS_DEFINE_FIELD_BIT("LS-bit for addresses", 4),
     SMBIOS_DEFINE_FIELD_BIT("Reserved", 5),
-    SMBIOS_DEFINE_BIT_FIELD("Register spacing", 6, 2, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosIpmiDeviceBaseaddressRegisterSpacingEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Register spacing", 6, 2, SmbiosIpmiDeviceBaseaddressRegisterSpacingEnum),
 };
 
 SMBIOS_TYPEINFO_SELECTANY
@@ -1805,9 +1805,10 @@ SMBIOS_FIELD_TYPE_INFO SmbiosType39FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_BIT("Hot-replaceable", 0),
     SMBIOS_DEFINE_FIELD_BIT("Present", 1),
     SMBIOS_DEFINE_FIELD_BIT("Unplugged from the wall", 2),
-    SMBIOS_DEFINE_BIT_FIELD("DMTF Input Voltage Range Switching", 3, 4, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosSystemPowerSupplyInputVoltageRangeSwitchingEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("Status", 7, 3, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosSystemPowerSupplyStatusEnum)),
-    SMBIOS_DEFINE_BIT_FIELD("DMTF Power Supply Type", 10, 4, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosSystemPowerSupplyTypeEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("DMTF Input Voltage Range Switching",
+                                  3, 4, SmbiosSystemPowerSupplyInputVoltageRangeSwitchingEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Status", 7, 3, SmbiosSystemPowerSupplyStatusEnum),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("DMTF Power Supply Type", 10, 4, SmbiosSystemPowerSupplyTypeEnum),
     SMBIOS_DEFINE_BIT_FIELD("Reserved", 14, 2, SmbiosDataTypeUInt),
     SMBIOS_DEFINE_FIELD_UINT(39, "Input Voltage Probe Handle", InputVoltageProbeHandle),
     SMBIOS_DEFINE_FIELD_UINT(39, "Cooling Device Handle", CoolingDeviceHandle),
@@ -1843,7 +1844,7 @@ SMBIOS_TYPEINFO_SELECTANY
 SMBIOS_FIELD_TYPE_INFO SmbiosType41FieldInfo[] = {
     SMBIOS_DEFINE_FIELD_STRING(41, "Reference Designation", ReferenceDesignation),
     SMBIOS_DEFINE_FIELD_UINT(41, "Device Type", Type.Value),
-    SMBIOS_DEFINE_BIT_FIELD("Type of Device", 0, 7, SmbiosDataTypeEnum, SMBIOS_FIELD_ENUM_VALUES(SmbiosOnboardDevicesExtendedTypeEnum)),
+    SMBIOS_DEFINE_BIT_FIELD_ENUM("Type of Device", 0, 7, SmbiosOnboardDevicesExtendedTypeEnum),
     SMBIOS_DEFINE_FIELD_BIT("Device Status", 7),
     SMBIOS_DEFINE_FIELD_UINT(41, "Device Type Instance", TypeInstance),
     SMBIOS_DEFINE_FIELD_UINT(41, "Segment Group Number", SegmentGroupNumber),
@@ -1953,7 +1954,7 @@ SMBIOS_TYPE_INFO SmbiosTypeInfo[] = {
     SMBIOS_DEFINE_TYPE(7, "Cache Information"),
     SMBIOS_DEFINE_TYPE(8, "Port Connector Information"),
     SMBIOS_DEFINE_TYPE(9, "System Slots"),
-    { 10, "On Board Devices Information", 0 },
+    { 10, "On Board Devices Information", 0, NULL },
     SMBIOS_DEFINE_TYPE(11, "OEM Strings"),
     SMBIOS_DEFINE_TYPE(12, "System Configuration Options"),
     SMBIOS_DEFINE_TYPE(13, "Firmware Language Information"),
@@ -1974,7 +1975,7 @@ SMBIOS_TYPE_INFO SmbiosTypeInfo[] = {
     SMBIOS_DEFINE_TYPE(28, "Temperature Probe"),
     SMBIOS_DEFINE_TYPE(29, "Electrical Current Probe"),
     SMBIOS_DEFINE_TYPE(30, "Out-of-Band Remote Access"),
-    { 31, "Boot Integrity Services (BIS) Entry Point", 0 },
+    { 31, "Boot Integrity Services (BIS) Entry Point", 0, NULL },
     SMBIOS_DEFINE_TYPE(32, "System Boot Information"),
     SMBIOS_DEFINE_TYPE(33, "64-Bit Memory Error Information"),
     SMBIOS_DEFINE_TYPE(34, "Management Device"),
@@ -1990,6 +1991,6 @@ SMBIOS_TYPE_INFO SmbiosTypeInfo[] = {
     SMBIOS_DEFINE_TYPE(44, "Processor Additional Information"),
     SMBIOS_DEFINE_TYPE(45, "Firmware Inventory Information"),
     SMBIOS_DEFINE_TYPE(46, "String Property"),
-    { 126, "Inactive", 0 },
-    { 127, "End-of-Table", 0 },
+    { 126, "Inactive", 0, NULL },
+    { 127, "End-of-Table", 0, NULL },
 };
