@@ -116,6 +116,19 @@ TestAcpi()
         assert(AcpiValidateRsdp(&RsdpBuffer, &Value) == FirmwareDecodeSuccess);
         assert(Value == &Rsdp);
     }
+    {
+        const ACPI_ROOT_SYSTEM_DESCRIPTION_POINTER* Value;
+        FIRMWARE_BUFFER TruncatedRsdpBuffer = { (const uint8_t*)&Rsdp, 20 };
+        for (; TruncatedRsdpBuffer.Size < offsetof(ACPI_ROOT_SYSTEM_DESCRIPTION_POINTER, XsdtAddress);
+             TruncatedRsdpBuffer.Size++)
+        {
+            assert(AcpiValidateRsdp(&TruncatedRsdpBuffer, &Value) == FirmwareDecodeTruncatedHeader);
+        }
+        for (; TruncatedRsdpBuffer.Size < sizeof(Rsdp); TruncatedRsdpBuffer.Size++)
+        {
+            assert(AcpiValidateRsdp(&TruncatedRsdpBuffer, &Value) == FirmwareDecodeTruncatedData);
+        }
+    }
 
     Madt->Header.Signature = ACPI_SIGNATURE_APIC;
     Madt->Header.Length = sizeof(MadtData);

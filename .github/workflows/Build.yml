@@ -89,6 +89,13 @@ jobs:
         gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./AcpiDecode.c -o AcpiDecode
         gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./CpuidDecode.c -o CpuidDecode
         gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./FirmwareSpecTest.c -o FirmwareSpecTest
+        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g \
+          ./Managed/GenerateSmbiosMetadata.c -o GenerateSmbiosMetadata
+    - name: Verify managed SMBIOS metadata
+      working-directory: ${{github.workspace}}
+      run: |
+        ./GenerateSmbiosMetadata >./SmbiosMetadata.g.cs
+        sed 's/\r$//' ./Managed/KNSoft.FirmwareSpec/SmbiosMetadata.g.cs | cmp ./SmbiosMetadata.g.cs
     - name: Run sample programs
       working-directory: ${{github.workspace}}
       run: |

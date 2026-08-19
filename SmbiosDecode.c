@@ -95,6 +95,12 @@ static bool GetSmbiosTableData(PSMBIOS_RAW_DATA* Data)
         printf("fstat failed with: %d\n", errno);
         goto _exit_0;
     }
+    if (sb.st_size < 0 || (uintmax_t)sb.st_size > UINT32_MAX ||
+        (uintmax_t)sb.st_size > SIZE_MAX - sizeof(SMBIOS_RAW_DATA))
+    {
+        puts("SMBIOS table is too large");
+        goto _exit_0;
+    }
     size = sizeof(SMBIOS_RAW_DATA) + sb.st_size;
     p = (PSMBIOS_RAW_DATA)malloc(size);
     if (p == NULL)
@@ -135,30 +141,34 @@ static bool GetSmbiosTableData(PSMBIOS_RAW_DATA* Data)
     }
     if (memcmp(anchor, SmbiosEntryPointAnchorString30, sizeof(SmbiosEntryPointAnchorString30)) == 0)
     {
-        if (!ReadSmbiosEntryField(fd, offsetof(SMBIOS_ENTRY_POINT_30, MajorVersion), &p->SMBIOSMajorVersion, sizeof(p->SMBIOSMajorVersion)) ||
-            !ReadSmbiosEntryField(fd, offsetof(SMBIOS_ENTRY_POINT_30, MinorVersion), &p->SMBIOSMinorVersion, sizeof(p->SMBIOSMajorVersion)) ||
-            !ReadSmbiosEntryField(fd, offsetof(SMBIOS_ENTRY_POINT_30, TableMaxSize), &p->Length, sizeof(p->Length)))
+        SMBIOS_ENTRY_POINT_30 entryPoint;
+
+        if (!ReadSmbiosEntryField(fd, 0, &entryPoint, sizeof(entryPoint)) ||
+            (uintmax_t)sb.st_size > entryPoint.TableMaxSize)
         {
             goto _exit_2;
         }
+        p->SMBIOSMajorVersion = entryPoint.MajorVersion;
+        p->SMBIOSMinorVersion = entryPoint.MinorVersion;
         p->DmiRevision = 3;
     } else if (memcmp(anchor, SmbiosEntryPointAnchorString21, sizeof(SmbiosEntryPointAnchorString21)) == 0)
     {
-        WORD len;
+        SMBIOS_ENTRY_POINT_21 entryPoint;
 
-        if (!ReadSmbiosEntryField(fd, offsetof(SMBIOS_ENTRY_POINT_21, MajorVersion), &p->SMBIOSMajorVersion, sizeof(p->SMBIOSMajorVersion)) ||
-            !ReadSmbiosEntryField(fd, offsetof(SMBIOS_ENTRY_POINT_21, MinorVersion), &p->SMBIOSMinorVersion, sizeof(p->SMBIOSMajorVersion)) ||
-            !ReadSmbiosEntryField(fd, offsetof(SMBIOS_ENTRY_POINT_21, TableLength), &len, sizeof(len)))
+        if (!ReadSmbiosEntryField(fd, 0, &entryPoint, sizeof(entryPoint)) ||
+            (uintmax_t)sb.st_size != entryPoint.TableLength)
         {
             goto _exit_2;
         }
-        p->Length = len;
+        p->SMBIOSMajorVersion = entryPoint.MajorVersion;
+        p->SMBIOSMinorVersion = entryPoint.MinorVersion;
         p->DmiRevision = 2;
     } else
     {
         goto _exit_2;
     }
     p->Used20CallingMethod = 0;
+    p->Length = (DWORD)sb.st_size;
 
     *Data = p;
     return true;

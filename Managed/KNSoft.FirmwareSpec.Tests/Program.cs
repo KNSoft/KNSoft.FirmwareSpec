@@ -54,13 +54,29 @@ static class Program
         SmbiosTable parsed = NotNull(table);
         Equal(new SmbiosVersion(3, 9), parsed.Version);
         Equal(2, parsed.Structures.Count);
+        Equal(49, SmbiosParser.Types.Count);
         Equal((ushort)0x1234, parsed.Structures[0].Handle);
+        Equal("System Information", parsed.Structures[0].TypeName);
+        SmbiosFieldInfo manufacturerField = parsed.Structures[0].Fields[0];
+        Equal("Manufacturer", manufacturerField.Name);
         True(parsed.Structures[0].TryReadUnsigned(4, 1, out ulong manufacturerIndex));
         Equal(1UL, manufacturerIndex);
-        True(parsed.Structures[0].TryGetString(1, out string? manufacturer));
+        True(parsed.Structures[0].TryGetString(manufacturerField, out string? manufacturer));
         Equal("KNSoft", manufacturer);
         True(parsed.Structures[0].TryGetString(2, out string? product));
         Equal("ZPigeon", product);
+
+        SmbiosTypeInfo memoryDevice = NotNull(SmbiosParser.GetTypeInfo(17));
+        SmbiosFieldInfo? technology = null;
+        foreach (SmbiosFieldInfo field in memoryDevice.Fields)
+        {
+            if (field.Name == "Memory Technology")
+            {
+                technology = field;
+                break;
+            }
+        }
+        Equal("MRDIMM (Deprecated in SMBIOS 3.9)", NotNull(NotNull(technology).GetEnumName(8)));
 
         raw[^1] = 1;
         Equal(FirmwareDecodeStatus.MissingTerminator, SmbiosParser.TryParseWindowsRaw(raw, out _));

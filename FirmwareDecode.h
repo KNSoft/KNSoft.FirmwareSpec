@@ -33,9 +33,16 @@ typedef struct _FIRMWARE_BUFFER
     size_t Size;
 } FIRMWARE_BUFFER;
 
+#if defined(__cplusplus)
+typedef char8_t FIRMWARE_UTF8_CHAR;
+#else
+typedef char FIRMWARE_UTF8_CHAR;
+#endif
+typedef const FIRMWARE_UTF8_CHAR* FIRMWARE_UTF8_STRING;
+
 typedef struct _FIRMWARE_ENUM_INFO
 {
-    const char* Name;
+    FIRMWARE_UTF8_STRING Name;
     uint64_t Value;
 } FIRMWARE_ENUM_INFO;
 
@@ -52,7 +59,7 @@ typedef enum _FIRMWARE_DATA_TYPE
 
 typedef struct _FIRMWARE_FIELD_INFO
 {
-    const char* Name;
+    FIRMWARE_UTF8_STRING Name;
     uint8_t IsBitField;
     uint16_t Offset;
     uint8_t Size;
@@ -143,7 +150,7 @@ FirmwareChecksum8(
 }
 
 static inline
-const char*
+FIRMWARE_UTF8_STRING
 FirmwareFindEnum(
     const FIRMWARE_ENUM_INFO* Values,
     size_t Count,

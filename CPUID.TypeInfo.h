@@ -26,11 +26,11 @@ typedef struct _CPUID_BIT_INFO
     uint32_t SubLeaf;
     CPUID_REGISTER Register;
     uint8_t Bit;
-    const char* Name;
+    FIRMWARE_UTF8_STRING Name;
 } CPUID_BIT_INFO;
 
 #define CPUID_FEATURE(Leaf, SubLeaf, Register, Bit, Name) \
-    { Leaf, SubLeaf, CpuidRegister##Register, Bit, Name }
+    { Leaf, SubLeaf, CpuidRegister##Register, Bit, u8##Name }
 
 static const CPUID_BIT_INFO CpuidFeatureInfo[] = {
     CPUID_FEATURE(0x01, 0, Ecx, 0, "SSE3"),

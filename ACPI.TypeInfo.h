@@ -15,7 +15,7 @@
 typedef struct _ACPI_TABLE_INFO
 {
     uint32_t Signature;
-    const char* Name;
+    FIRMWARE_UTF8_STRING Name;
     uint16_t MinimumSize;
     uint16_t FieldCount;
     const FIRMWARE_FIELD_INFO* Fields;
@@ -23,14 +23,15 @@ typedef struct _ACPI_TABLE_INFO
 } ACPI_TABLE_INFO;
 
 #define ACPI_FIELD(Type, Field, Name, DataType) \
-    { Name, false, (uint16_t)offsetof(Type, Field), (uint8_t)sizeof(((Type*)0)->Field), DataType, { 0, NULL } }
+    { u8##Name, false, (uint16_t)offsetof(Type, Field), \
+      (uint8_t)sizeof(((Type*)0)->Field), DataType, { 0, NULL } }
 #define ACPI_FIELD_UINT(Type, Field, Name) ACPI_FIELD(Type, Field, Name, FirmwareDataTypeUInt)
 #define ACPI_FIELD_RAW(Type, Field, Name) ACPI_FIELD(Type, Field, Name, FirmwareDataTypeRaw)
 #define ACPI_FIELDS(Fields) (uint16_t)(sizeof(Fields) / sizeof((Fields)[0])), Fields
 #define ACPI_TABLE(Signature, Name, Type, Fields) \
-    { Signature, Name, (uint16_t)sizeof(Type), ACPI_FIELDS(Fields), false }
+    { Signature, u8##Name, (uint16_t)sizeof(Type), ACPI_FIELDS(Fields), false }
 #define ACPI_RAW_TABLE(Signature, Name) \
-    { Signature, Name, (uint16_t)sizeof(ACPI_DESCRIPTION_HEADER), 0, NULL, true }
+    { Signature, u8##Name, (uint16_t)sizeof(ACPI_DESCRIPTION_HEADER), 0, NULL, true }
 
 static const FIRMWARE_FIELD_INFO AcpiHeaderFields[] = {
     ACPI_FIELD_UINT(ACPI_DESCRIPTION_HEADER, Length, "Length"),
@@ -99,25 +100,27 @@ static const ACPI_TABLE_INFO AcpiTableInfo[] = {
     ACPI_TABLE(ACPI_SIGNATURE_APIC, "Multiple APIC Description Table", ACPI_MADT, AcpiMadtFields),
     ACPI_TABLE(ACPI_SIGNATURE_BGRT, "Boot Graphics Resource Table", ACPI_BGRT, AcpiBgrtFields),
     ACPI_RAW_TABLE(ACPI_SIGNATURE_DSDT, "Differentiated System Description Table (AML)"),
-    { ACPI_SIGNATURE_FACP, "Fixed ACPI Description Table", (uint16_t)offsetof(ACPI_FADT, ResetRegister),
+    { ACPI_SIGNATURE_FACP, u8"Fixed ACPI Description Table",
+      (uint16_t)offsetof(ACPI_FADT, ResetRegister),
       ACPI_FIELDS(AcpiFadtFields), false },
     ACPI_RAW_TABLE(ACPI_SIGNATURE_HMAT, "Heterogeneous Memory Attribute Table"),
     ACPI_TABLE(ACPI_SIGNATURE_HPET, "High Precision Event Timer Table", ACPI_HPET, AcpiHpetFields),
     ACPI_RAW_TABLE(ACPI_SIGNATURE_IORT, "IO Remapping Table"),
-    { ACPI_SIGNATURE_MCFG, "PCI Express Memory Mapped Configuration Table",
+    { ACPI_SIGNATURE_MCFG, u8"PCI Express Memory Mapped Configuration Table",
       (uint16_t)sizeof(ACPI_MCFG), 0, NULL, false },
     ACPI_RAW_TABLE(ACPI_SIGNATURE_NFIT, "NVDIMM Firmware Interface Table"),
     ACPI_RAW_TABLE(ACPI_SIGNATURE_PCCT, "Platform Communications Channel Table"),
     ACPI_RAW_TABLE(ACPI_SIGNATURE_PPTT, "Processor Properties Topology Table"),
-    { ACPI_SIGNATURE_RSDT, "Root System Description Table",
+    { ACPI_SIGNATURE_RSDT, u8"Root System Description Table",
       (uint16_t)sizeof(ACPI_DESCRIPTION_HEADER), 0, NULL, false },
     ACPI_TABLE(ACPI_SIGNATURE_SLIT, "System Locality Information Table", ACPI_SLIT, AcpiSlitFields),
-    { ACPI_SIGNATURE_SRAT, "System Resource Affinity Table", (uint16_t)sizeof(ACPI_SRAT), 0, NULL, false },
+    { ACPI_SIGNATURE_SRAT, u8"System Resource Affinity Table",
+      (uint16_t)sizeof(ACPI_SRAT), 0, NULL, false },
     ACPI_RAW_TABLE(ACPI_SIGNATURE_SSDT, "Secondary System Description Table (AML)"),
     ACPI_TABLE(ACPI_SIGNATURE_TPM2, "Trusted Computing Platform 2 Table", ACPI_TPM2, AcpiTpm2Fields),
     ACPI_TABLE(ACPI_SIGNATURE_WAET, "Windows ACPI Emulated Devices Table", ACPI_WAET, AcpiWaetFields),
     ACPI_TABLE(ACPI_SIGNATURE_WSMT, "Windows SMM Security Mitigations Table", ACPI_WSMT, AcpiWsmtFields),
-    { ACPI_SIGNATURE_XSDT, "Extended System Description Table",
+    { ACPI_SIGNATURE_XSDT, u8"Extended System Description Table",
       (uint16_t)sizeof(ACPI_DESCRIPTION_HEADER), 0, NULL, false },
 };
 
