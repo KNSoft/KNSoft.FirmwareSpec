@@ -26,7 +26,7 @@ jobs:
       uses: microsoft/setup-msbuild@main
     - name: Build
       working-directory: ${{github.workspace}}
-      run: msbuild ".\VSProject\KNSoft.FirmwareSpec.sln" /restore /m /p:Configuration=${{matrix.config}} /p:Platform=${{matrix.platform}} /p:RestorePackagesConfig=true
+      run: msbuild ".\VSProject\KNSoft.FirmwareSpec.sln" /restore /m /p:Configuration=${{matrix.config}} /p:Platform=${{matrix.platform}} /p:RestorePackagesConfig=true /p:RunCodeAnalysis=true /p:EnableCppCodeAnalysis=true /p:CodeAnalysisTreatWarningsAsErrors=true
     - name: Run sample programs
       if: ${{ matrix.platform == 'x64' || matrix.platform == 'x86' }}
       working-directory: ${{github.workspace}}
