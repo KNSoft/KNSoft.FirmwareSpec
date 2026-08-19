@@ -9,6 +9,9 @@
 
 #pragma once
 
+#include <assert.h>
+#include <stdint.h>
+
 #define CPUID_INTEL_VERSION_INFO_MASK 0xFFF3FF0 // Extended Family ID | Extended Model ID | Processor Type | Family ID | Model
 #define CPUID_MAKE_INTEL_VERSION_INFO(ExtendedFamilyId, ExtendedModelId, ProcessorType, FamilyId, Model, SteppingId)\
     (((ExtendedFamilyId & 0b11111111) << 20) |\
@@ -308,3 +311,5 @@ typedef union _CPUID_INFO
     } F07_01;
 
 } CPUID_INFO, *PCPUID_INFO;
+
+static_assert(sizeof(CPUID_INFO) == 16);

@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\SmbiosDecode.c" />
+    <ClCompile Include="..\FirmwareSpecTest.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ACPI.Decode.h" />
+    <ClInclude Include="..\ACPI.h" />
+    <ClInclude Include="..\ACPI.TypeInfo.h" />
+    <ClInclude Include="..\CPUID.Decode.h" />
+    <ClInclude Include="..\CPUID.h" />
+    <ClInclude Include="..\CPUID.TypeInfo.h" />
     <ClInclude Include="..\FirmwareDecode.h" />
     <ClInclude Include="..\SMBIOS.Decode.h" />
     <ClInclude Include="..\SMBIOS.h" />
     <ClInclude Include="..\SMBIOS.TypeInfo.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\SMBIOS.TypeInfo.inl" />
   </ItemGroup>
 </Project>

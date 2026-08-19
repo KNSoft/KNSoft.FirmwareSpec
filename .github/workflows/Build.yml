@@ -31,7 +31,10 @@ jobs:
       if: ${{ matrix.platform == 'x64' || matrix.platform == 'x86' }}
       working-directory: ${{github.workspace}}
       run: |
+        & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\FirmwareSpecTest.exe
+        & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\CpuidDecode.exe >.\CpuidDecode.txt
         & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\SmbiosDecode.exe >.\SmbiosDecode.txt
+        Get-Content .\CpuidDecode.txt
         Get-Content .\SmbiosDecode.txt
     - name: Archive sample programs and outputs
       if: ${{ matrix.platform == 'x64' || matrix.platform == 'x86' }}
@@ -39,7 +42,11 @@ jobs:
       with:
         name: KNSoft.FirmwareSpec-Windows-MSVC-${{matrix.platform}}-${{matrix.config}}-${{github.sha}}
         path: |
+          .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\AcpiDecode.exe
+          .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\CpuidDecode.exe
+          .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\FirmwareSpecTest.exe
           .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\SmbiosDecode.exe
+          .\CpuidDecode.txt
           .\SmbiosDecode.txt
 
   Build-Linux-GCC:
@@ -53,16 +60,27 @@ jobs:
           submodules: recursive
     - name: Build
       working-directory: ${{github.workspace}}
-      run: gcc -fdiagnostics-color=always -D_LINUX -g ./SmbiosDecode.c -o SmbiosDecode
+      run: |
+        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -D_LINUX -g ./SmbiosDecode.c -o SmbiosDecode
+        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./AcpiDecode.c -o AcpiDecode
+        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./CpuidDecode.c -o CpuidDecode
+        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./FirmwareSpecTest.c -o FirmwareSpecTest
     - name: Run sample programs
       working-directory: ${{github.workspace}}
       run: |
+        ./FirmwareSpecTest
+        ./CpuidDecode >./CpuidDecode.txt
         sudo ./SmbiosDecode >./SmbiosDecode.txt
+        cat ./CpuidDecode.txt
         cat ./SmbiosDecode.txt
     - name: Archive sample programs and outputs
       uses: actions/upload-artifact@main
       with:
         name: KNSoft.FirmwareSpec-Linux-GCC-${{github.sha}}
         path: |
+          ./AcpiDecode
+          ./CpuidDecode
+          ./CpuidDecode.txt
+          ./FirmwareSpecTest
           ./SmbiosDecode
           ./SmbiosDecode.txt
