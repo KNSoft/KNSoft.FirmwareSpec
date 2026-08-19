@@ -13,7 +13,7 @@
 | :- | :- | :- | :- |
 | [SMBIOS 3.9.0](https://www.dmtf.org/standards/smbios) | [SMBIOS.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.h) | [SMBIOS.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SMBIOS.TypeInfo.h) | [SmbiosDecode.c](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/SmbiosDecode.c) |
 | [ACPI 6.6](https://uefi.org/specifications) | [ACPI.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/ACPI.h) | [ACPI.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/ACPI.TypeInfo.h) | [AcpiDecode.c](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/AcpiDecode.c) |
-| CPUID | [CPUID.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CPUID.h) | [CPUID.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CPUID.TypeInfo.h) | [CpuidDecode.c](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CpuidDecode.c) |
+| Intel CPUID (SDM v092 Leaf 01H/07H) | [CPUID.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CPUID.h) | [CPUID.TypeInfo.h](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CPUID.TypeInfo.h) | [CpuidDecode.c](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/CpuidDecode.c) |
 
 The shared decoder primitives in `FirmwareDecode.h` perform bounds, overflow, length, and checksum validation without allocation. Complex AML, OEM-defined, and architecture-specific payloads remain available as bounded raw data when a compact generic representation would lose semantics.
 

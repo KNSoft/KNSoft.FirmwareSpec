@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_WIN32)
+#include <Windows.h>
+#elif defined(__linux__)
+#include <dirent.h>
+#include <string.h>
+#endif
+
 static
 void
 PrintSignature(
@@ -57,15 +64,48 @@ PrintFields(
 
 static
 int
+DecodeTable(
+    const uint8_t* Data,
+    size_t Size)
+{
+    ACPI_TABLE_VIEW View;
+    FIRMWARE_BUFFER Buffer = { Data, Size };
+    FIRMWARE_DECODE_STATUS Status;
+
+    Status = AcpiValidateTable(&Buffer, true, &View);
+    if (Status != FirmwareDecodeSuccess)
+    {
+        printf("Invalid ACPI table, status %u\n", Status);
+        return 1;
+    }
+
+    printf("Signature: ");
+    PrintSignature(View.Header->Signature);
+    printf("\nName: %s\nLength: %u\nRevision: %u\n",
+           View.Info == NULL ? "Unknown or OEM-defined table" : View.Info->Name,
+           View.Header->Length,
+           View.Header->Revision);
+    PrintFields(&View.Data, AcpiHeaderFields, sizeof(AcpiHeaderFields) / sizeof(AcpiHeaderFields[0]));
+    if (View.Info != NULL)
+    {
+        PrintFields(&View.Data, View.Info->Fields, View.Info->FieldCount);
+        if (View.Info->RawBody)
+        {
+            puts("  Body: raw (AML, OEM-defined, or intentionally unsupported)");
+        }
+    }
+    return 0;
+}
+
+static
+int
 DecodeFile(
     const char* Path)
 {
-    ACPI_TABLE_VIEW View;
-    FIRMWARE_BUFFER Buffer;
-    FIRMWARE_DECODE_STATUS Status;
     FILE* File;
     uint8_t* Data;
     long FileSize;
+    int Result;
 
 #if defined(_MSC_VER)
     if (fopen_s(&File, Path, "rb") != 0)
@@ -90,45 +130,122 @@ DecodeFile(
         return 1;
     }
     fclose(File);
+    Result = DecodeTable(Data, (size_t)FileSize);
+    free(Data);
+    return Result;
+}
 
-    Buffer.Data = Data;
-    Buffer.Size = (size_t)FileSize;
-    Status = AcpiValidateTable(&Buffer, true, &View);
-    if (Status != FirmwareDecodeSuccess)
+#if defined(_WIN32)
+
+static
+int
+DecodeSystemTables()
+{
+    DWORD* TableIds;
+    UINT IdBytes = EnumSystemFirmwareTables('ACPI', NULL, 0);
+    UINT Index;
+    int Result = 0;
+
+    if (IdBytes == 0)
     {
-        printf("Invalid ACPI table, status %u\n", Status);
-        free(Data);
+        printf("EnumSystemFirmwareTables failed: 0x%08lX\n", GetLastError());
+        return 1;
+    }
+    if (IdBytes % sizeof(*TableIds) != 0)
+    {
+        puts("EnumSystemFirmwareTables returned an invalid table list");
+        return 1;
+    }
+    TableIds = (DWORD*)malloc(IdBytes);
+    if (TableIds == NULL)
+    {
+        return 1;
+    }
+    if (EnumSystemFirmwareTables('ACPI', TableIds, IdBytes) != IdBytes)
+    {
+        printf("EnumSystemFirmwareTables failed: 0x%08lX\n", GetLastError());
+        free(TableIds);
         return 1;
     }
 
-    printf("Signature: ");
-    PrintSignature(View.Header->Signature);
-    printf("\nName: %s\nLength: %u\nRevision: %u\n",
-           View.Info == NULL ? "Unknown or OEM-defined table" : View.Info->Name,
-           View.Header->Length,
-           View.Header->Revision);
-    PrintFields(&View.Data, AcpiHeaderFields, sizeof(AcpiHeaderFields) / sizeof(AcpiHeaderFields[0]));
-    if (View.Info != NULL)
+    for (Index = 0; Index < IdBytes / sizeof(*TableIds); Index++)
     {
-        PrintFields(&View.Data, View.Info->Fields, View.Info->FieldCount);
-        if (View.Info->RawBody)
+        UINT TableSize = GetSystemFirmwareTable('ACPI', TableIds[Index], NULL, 0);
+        void* Table;
+
+        if (TableSize == 0 || (Table = malloc(TableSize)) == NULL)
         {
-            puts("  Body: raw (AML, OEM-defined, or intentionally unsupported)");
+            Result = 1;
+            continue;
         }
+        if (GetSystemFirmwareTable('ACPI', TableIds[Index], Table, TableSize) != TableSize)
+        {
+            printf("GetSystemFirmwareTable failed: 0x%08lX\n", GetLastError());
+            Result = 1;
+        } else
+        {
+            Result |= DecodeTable((const uint8_t*)Table, TableSize);
+        }
+        free(Table);
     }
-    free(Data);
-    return 0;
+    free(TableIds);
+    return Result;
 }
+
+#elif defined(__linux__)
+
+static
+int
+DecodeSystemTables()
+{
+    static const char DirectoryPath[] = "/sys/firmware/acpi/tables";
+    DIR* Directory = opendir(DirectoryPath);
+    struct dirent* Entry;
+    int Result = 0;
+
+    if (Directory == NULL)
+    {
+        printf("ACPI tables are unavailable: %d\n", errno);
+        return 0;
+    }
+    while ((Entry = readdir(Directory)) != NULL)
+    {
+        char Path[sizeof(DirectoryPath) + 1 + 256];
+        int Length;
+
+        if (Entry->d_name[0] == '.' || strcmp(Entry->d_name, "dynamic") == 0)
+        {
+            continue;
+        }
+        Length = snprintf(Path, sizeof(Path), "%s/%s", DirectoryPath, Entry->d_name);
+        if (Length < 0 || (size_t)Length >= sizeof(Path))
+        {
+            Result = 1;
+            continue;
+        }
+        Result |= DecodeFile(Path);
+    }
+    closedir(Directory);
+    return Result;
+}
+
+#endif
 
 int
 main(
     int ArgumentCount,
     char** Arguments)
 {
-    if (ArgumentCount != 2)
+    if (ArgumentCount == 2)
     {
-        printf("Usage: %s <ACPI table binary>\n", Arguments[0]);
-        return 0;
+        return DecodeFile(Arguments[1]);
     }
-    return DecodeFile(Arguments[1]);
+#if defined(_WIN32) || defined(__linux__)
+    if (ArgumentCount == 1)
+    {
+        return DecodeSystemTables();
+    }
+#endif
+    printf("Usage: %s [ACPI table binary]\n", Arguments[0]);
+    return 1;
 }
