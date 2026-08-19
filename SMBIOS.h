@@ -1705,6 +1705,9 @@ typedef struct _SMBIOS_PHYSICAL_MEMORY_ARRAY
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_NVDIMM_F                        ((BYTE)0x05) // NVDIMM-F
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_NVDIMM_P                        ((BYTE)0x06) // NVDIMM-P
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_INTEL_OPTANE_PERSISTENT_MEMORY  ((BYTE)0x07) // Intel® Optane™ persistent memory
+#if SMBIOS_VERSION >= 0x03080000
+#define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_MRDIMM                          ((BYTE)0x08) // MRDIMM; deprecated in 3.9
+#endif // SMBIOS_VERSION >= 0x03080000
 
 typedef struct _SMBIOS_MEMORY_DEVICE
 {
