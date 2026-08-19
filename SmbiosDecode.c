@@ -65,11 +65,14 @@ static char SmbiosEntryPointAnchorString30[] = SMBIOS_ENTRY_POINT_30_ANCHOR_STRI
 
 static bool ReadSmbiosEntryField(int fd, off_t off, void* p, size_t len)
 {
+    ssize_t Size;
+
     if (lseek(fd, off, SEEK_SET) == (off_t)-1)
     {
         return false;
     }
-    return read(fd, p, len) == len;
+    Size = read(fd, p, len);
+    return Size >= 0 && (size_t)Size == len;
 }
 
 static bool GetSmbiosTableData(PSMBIOS_RAW_DATA* Data)
