@@ -7,7 +7,7 @@
 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/KNSoft.FirmwareSpec)](https://www.nuget.org/packages/KNSoft.FirmwareSpec) [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/KNSoft/KNSoft.FirmwareSpec/Build.yml)](https://github.com/KNSoft/KNSoft.FirmwareSpec/actions/workflows/Build.yml) ![PR Welcome](https://img.shields.io/badge/PR-welcome-0688CB.svg) [![GitHub License](https://img.shields.io/github/license/KNSoft/KNSoft.FirmwareSpec)](https://github.com/KNSoft/KNSoft.FirmwareSpec/blob/main/LICENSE)
 
-[KNSoft.FirmwareSpec](https://github.com/KNSoft/KNSoft.FirmwareSpec) provides C/C++ definitions, explicit type metadata, and zero-copy decoders for firmware and processor interfaces. It is compatible with MSVC and GCC.
+[KNSoft.FirmwareSpec](https://github.com/KNSoft/KNSoft.FirmwareSpec) provides C/C++ definitions, explicit type metadata, and safe C/C++ and .NET decoders for firmware and processor interfaces. The native interface is compatible with MSVC and GCC.
 
 | Specification | Definition | Type information | Sample program |
 | :- | :- | :- | :- |
@@ -29,6 +29,16 @@ NuGet package [KNSoft.FirmwareSpec](https://www.nuget.org/packages/KNSoft.Firmwa
 ```
 
 SMBIOS definitions support compile-time version selection through `SMBIOS_VERSION`. See each header for its supported specification level.
+
+The same package contains a pure .NET 10 parser. It performs no local firmware I/O, so a server can safely parse byte buffers collected by a remote endpoint:
+
+```C#
+FirmwareDecodeStatus status = SmbiosParser.TryParseWindowsRaw(data, out SmbiosTable? table);
+status = AcpiParser.TryParse(data, out AcpiTable? acpiTable);
+status = CpuidParser.TryParse(data, out CpuidSnapshot? snapshot);
+```
+
+`SmbiosParser.TryParseWindowsRaw` accepts the `RAW_SMBIOS_DATA` buffer returned by Windows. `AcpiParser.TryParse` accepts one complete ACPI table. CPUID is transported as consecutive 24-byte little-endian records containing `Leaf`, `SubLeaf`, `EAX`, `EBX`, `ECX`, and `EDX`; CPUID is executed only by the collector, never by the parser.
 
 > [!CAUTION]
 > In beta stage, may contains some bugs and various issues, should be used with caution.

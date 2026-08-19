@@ -1,1 +1,4 @@
 /*.nupkg
+/Artifacts/
+/Managed/**/bin/
+/Managed/**/obj/
