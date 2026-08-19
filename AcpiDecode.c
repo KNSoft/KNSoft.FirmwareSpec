@@ -8,7 +8,7 @@
 #include <Windows.h>
 #elif defined(__linux__)
 #include <dirent.h>
-#include <string.h>
+#include <sys/stat.h>
 #endif
 
 static
@@ -212,8 +212,9 @@ DecodeSystemTables()
     {
         char Path[sizeof(DirectoryPath) + 1 + 256];
         int Length;
+        struct stat FileStatus;
 
-        if (Entry->d_name[0] == '.' || strcmp(Entry->d_name, "dynamic") == 0)
+        if (Entry->d_name[0] == '.')
         {
             continue;
         }
@@ -221,6 +222,15 @@ DecodeSystemTables()
         if (Length < 0 || (size_t)Length >= sizeof(Path))
         {
             Result = 1;
+            continue;
+        }
+        if (stat(Path, &FileStatus) != 0)
+        {
+            Result = 1;
+            continue;
+        }
+        if (!S_ISREG(FileStatus.st_mode))
+        {
             continue;
         }
         Result |= DecodeFile(Path);
