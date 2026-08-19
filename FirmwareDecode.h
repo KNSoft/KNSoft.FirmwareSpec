@@ -35,6 +35,8 @@ typedef struct _FIRMWARE_BUFFER
 
 #if defined(__cplusplus)
 typedef char8_t FIRMWARE_UTF8_CHAR;
+#elif !defined(_MSC_VER) && defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L
+typedef unsigned char FIRMWARE_UTF8_CHAR;
 #else
 typedef char FIRMWARE_UTF8_CHAR;
 #endif

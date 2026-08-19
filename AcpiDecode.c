@@ -42,7 +42,7 @@ PrintFields(
 
             if (FirmwareBuffer_ReadUInt(Buffer, Field->Offset, Field->Size, &Value))
             {
-                printf("  %s: 0x%0*llX\n", Field->Name, Field->Size * 2, (unsigned long long)Value);
+                printf("  %s: 0x%0*llX\n", (const char*)Field->Name, Field->Size * 2, (unsigned long long)Value);
             }
         } else if (Field->Type == FirmwareDataTypeRaw)
         {
@@ -53,7 +53,7 @@ PrintFields(
             {
                 continue;
             }
-            printf("  %s: \"", Field->Name);
+            printf("  %s: \"", (const char*)Field->Name);
             for (ByteIndex = 0; ByteIndex < Field->Size; ByteIndex++)
             {
                 putchar(Bytes[ByteIndex] >= 0x20 && Bytes[ByteIndex] <= 0x7E ? Bytes[ByteIndex] : '.');
@@ -83,7 +83,7 @@ DecodeTable(
     printf("Signature: ");
     PrintSignature(View.Header->Signature);
     printf("\nName: %s\nLength: %u\nRevision: %u\n",
-           View.Info == NULL ? "Unknown or OEM-defined table" : View.Info->Name,
+           View.Info == NULL ? "Unknown or OEM-defined table" : (const char*)View.Info->Name,
            View.Header->Length,
            View.Header->Revision);
     PrintFields(&View.Data, AcpiHeaderFields, sizeof(AcpiHeaderFields) / sizeof(AcpiHeaderFields[0]));
