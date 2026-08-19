@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -102,9 +103,9 @@ int
 DecodeFile(
     const char* Path)
 {
+    ACPI_DESCRIPTION_HEADER Header;
     FILE* File;
     uint8_t* Data;
-    long FileSize;
     int Result;
 
 #if defined(_MSC_VER)
@@ -117,20 +118,28 @@ DecodeFile(
         printf("Cannot open %s: %d\n", Path, errno);
         return 1;
     }
-    if (fseek(File, 0, SEEK_END) != 0 || (FileSize = ftell(File)) < 0 || fseek(File, 0, SEEK_SET) != 0)
+    if (fread(&Header, 1, sizeof(Header), File) != sizeof(Header) || Header.Length < sizeof(Header))
+    {
+        printf("Cannot read ACPI header from %s\n", Path);
+        fclose(File);
+        return 1;
+    }
+    Data = (uint8_t*)malloc(Header.Length);
+    if (Data == NULL)
     {
         fclose(File);
         return 1;
     }
-    Data = (uint8_t*)malloc((size_t)FileSize);
-    if (Data == NULL || fread(Data, 1, (size_t)FileSize, File) != (size_t)FileSize)
+    memcpy(Data, &Header, sizeof(Header));
+    if (fread(Data + sizeof(Header), 1, Header.Length - sizeof(Header), File) != Header.Length - sizeof(Header))
     {
+        printf("Cannot read ACPI table from %s\n", Path);
         free(Data);
         fclose(File);
         return 1;
     }
     fclose(File);
-    Result = DecodeTable(Data, (size_t)FileSize);
+    Result = DecodeTable(Data, Header.Length);
     free(Data);
     return Result;
 }
