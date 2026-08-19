@@ -74,6 +74,9 @@ TestSmbios()
     Offset = 0;
     Status = SmbiosNextStructure(&MissingTerminatorBuffer, &Offset, &View);
     assert(Status == FirmwareDecodeMissingTerminator);
+    assert(FirmwareFindEnum(SmbiosMemoryDeviceTechnologyEnum,
+                            sizeof(SmbiosMemoryDeviceTechnologyEnum) / sizeof(SmbiosMemoryDeviceTechnologyEnum[0]),
+                            SMBIOS_MEMORY_DEVICE_TECHNOLOGY_MRDIMM) != NULL);
 }
 
 static
