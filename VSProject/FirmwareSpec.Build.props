@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <IntDir>IntDir\$(MSBuildProjectName)\$(KnsoftArch)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

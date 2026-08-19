@@ -2,6 +2,7 @@
  * KNSoft.FirmwareSpec (https://github.com/KNSoft/KNSoft.FirmwareSpec)
  *
  * Definitions for Intel CPUID Specification.
+ * Leaf 01H and 07H fields match Intel SDM Volume 1, version 092 (June 2026).
  *
  * Licensed under the MIT license.
  * Copyright (c) KNSoft.org (https://github.com/KNSoft). All rights reserved.
@@ -12,7 +13,8 @@
 #include <assert.h>
 #include <stdint.h>
 
-#define CPUID_INTEL_VERSION_INFO_MASK 0xFFF3FF0 // Extended Family ID | Extended Model ID | Processor Type | Family ID | Model
+#define CPUID_INTEL_VERSION_INFO_MASK 0xFFF3FF0 // Extended Family ID | Extended Model ID | Processor Type | Family ID |
+                                                 // Model
 #define CPUID_MAKE_INTEL_VERSION_INFO(ExtendedFamilyId, ExtendedModelId, ProcessorType, FamilyId, Model, SteppingId)\
     (((ExtendedFamilyId & 0b11111111) << 20) |\
      ((ExtendedModelId & 0b1111) << 16) |\
@@ -174,10 +176,10 @@ typedef union _CPUID_INFO
                 unsigned int ERMS : 1;                 /* 09 Enhanced Fast Strings REP MOVB/STOB */
                 unsigned int INVPCID : 1;              /* 10 INVPCID */
                 unsigned int RTM : 1;                  /* 11 RTM */
-                unsigned int RDT_M : 1;                /* 12 Intel® Resource Director Technology (Intel® RDT) Monitoring */
+                unsigned int RDT_M : 1;                /* 12 Intel® RDT Monitoring */
                 unsigned int DeprecatesFPUCSDS : 1;    /* 13 Deprecates FPU CS and FPU DS */
                 unsigned int MPX : 1;                  /* 14 Intel® Memory Protection Extensions */
-                unsigned int RDT_A : 1;                /* 15 Intel® Resource Director Technology (Intel® RDT) Allocation */
+                unsigned int RDT_A : 1;                /* 15 Intel® RDT Allocation */
                 unsigned int AVX512F : 1;              /* 16 AVX512F */
                 unsigned int AVX512DQ : 1;             /* 17 AVX512DQ */
                 unsigned int RDSEED : 1;               /* 18 RDSEED */
@@ -218,7 +220,7 @@ typedef union _CPUID_INFO
                 unsigned int MAWAU : 5;                /* 17-21 57-bit linear addresses and five-level paging */
                 unsigned int RDPID : 1;                /* 22 RDPID and IA32_TSC_AUX */
                 unsigned int KL : 1;                   /* 23 Key Locker */
-                unsigned int ReservedBits2 : 1;        /* 24 Reserved */
+                unsigned int BUS_LOCK_DETECT : 1;      /* 24 OS bus-lock detection */
                 unsigned int CLDEMOTE : 1;             /* 25 Cache line demote */
                 unsigned int ReservedBits3 : 1;        /* 26 Reserved */
                 unsigned int MOVDIRI : 1;              /* 27 MOVDIRI */
@@ -238,29 +240,29 @@ typedef union _CPUID_INFO
                 unsigned int UINTR : 1;                    /* 05 User interrupts */
                 unsigned int ReservedBits5 : 2;            /* 06-07 Reserved */
                 unsigned int AVX512_VP2INTERSECT : 1;      /* 08 AVX512_VP2INTERSECT */
-                unsigned int SRBDS_CTRL : 1;               /* 09 SRBDS_CTRL */
+                unsigned int MCU_OPT_CTRL : 1;             /* 09 IA32_MCU_OPT_CTRL */
                 unsigned int MD_CLEAR : 1;                 /* 10 MD_CLEAR */
                 unsigned int RTM_ALWAYS_ABORT : 1;         /* 11 RTM_ALWAYS_ABORT */
                 unsigned int ReservedBits6 : 1;            /* 12 Reserved */
                 unsigned int RTM_FORCE_ABORT : 1;          /* 13 RTM_FORCE_ABORT */
                 unsigned int SERIALIZE : 1;                /* 14 SERIALIZE */
-                unsigned int Hybrid : 1;                   /* 15 Hybrid */
+                unsigned int HYBRID : 1;                   /* 15 Hybrid processor */
                 unsigned int TSXLDTRK : 1;                 /* 16 Intel TSX suspend/resume of load address tracking */
                 unsigned int ReservedBits7 : 1;            /* 17 Reserved */
                 unsigned int PCONFIG : 1;                  /* 18 PCONFIG */
-                unsigned int ArchitecturalLBRs : 1;        /* 19 Architectural LBRs */
+                unsigned int ARCH_LBRS : 1;                /* 19 Architectural LBRs */
                 unsigned int CET_IBT : 1;                  /* 20 CET indirect branch tracking */
                 unsigned int ReservedBits8 : 1;            /* 21 Reserved */
                 unsigned int AMX_BF16 : 1;                 /* 22 Tile computational operations on bfloat16 numbers */
                 unsigned int AVX512_FP16 : 1;              /* 23 AVX512_FP16 */
                 unsigned int AMX_TILE : 1;                 /* 24 Tile architecture */
                 unsigned int AMX_INT8 : 1;                 /* 25 Tile computational operations on 8-bit integers */
-                unsigned int Enum_IBRS_IBPB : 1;           /* 26 Enumerates for IBRS and IBPB */
-                unsigned int Enum_STIBP : 1;               /* 27 Enumerates for STIBP */
-                unsigned int Enum_L1D_FLUSH : 1;           /* 28 Enumerates for L1D_FLUSH */
-                unsigned int Enum_ARCH_CAPABILITIES : 1;   /* 29 Enumerates for the IA32_ARCH_CAPABILITIES MSR */
-                unsigned int Enum_CORE_CAPABILITIES : 1;   /* 30 Enumerates for the IA32_CORE_CAPABILITIES MSR */
-                unsigned int Enum_SSBD : 1;                /* 31 Enumerates for SSBD */
+                unsigned int IBRS_IBPB : 1;                /* 26 IBRS and IBPB */
+                unsigned int SPEC_CTRL_ST_PREDICTORS : 1;  /* 27 STIBP */
+                unsigned int L1D_FLUSH_INTERFACE : 1;      /* 28 L1D_FLUSH */
+                unsigned int ARCH_CAPABILITIES : 1;        /* 29 IA32_ARCH_CAPABILITIES */
+                unsigned int CORE_CAPABILITIES : 1;        /* 30 IA32_CORE_CAPABILITIES */
+                unsigned int SPEC_CTRL_SSBD : 1;           /* 31 SSBD */
             };
         } FeatureFlags;
     } F07_00;
@@ -281,34 +283,96 @@ typedef union _CPUID_INFO
             /* Eax */
             struct
             {
-                unsigned int ReservedBits0 : 4;    /* 00-03 Reserved */
+                unsigned int SHA512 : 1;           /* 00 SHA512 */
+                unsigned int SM3 : 1;              /* 01 SM3 */
+                unsigned int SM4 : 1;              /* 02 SM4 */
+                unsigned int ReservedBits0 : 1;    /* 03 Reserved */
                 unsigned int AVX_VNNI : 1;         /* 04 AVX-VNNI */
                 unsigned int AVX512_BF16 : 1;      /* 05 AVX512_BF16 */
-                unsigned int ReservedBits1 : 4;    /* 06-09 Reserved */
-                unsigned int FZRM : 1;             /* 10 Fast zero-length REP MOVSB */
-                unsigned int FSRS : 1;             /* 11 Fast short REP STOSB */
-                unsigned int FSRCS : 1;            /* 12 Fast short REP CMPSB/SCASB */
-                unsigned int ReservedBits2 : 9;    /* 13-21 Reserved */
+                unsigned int LASS : 1;             /* 06 Linear Address Space Separation */
+                unsigned int CMPCCXADD : 1;        /* 07 CMPccXADD */
+                unsigned int ARCH_PERFMON_EXT : 1; /* 08 Architectural Performance Monitoring Extended Leaf */
+                unsigned int ReservedBits1 : 1;    /* 09 Reserved */
+                unsigned int FAST_REP_MOVSB : 1;   /* 10 Fast zero-length REP MOVSB */
+                unsigned int FAST_REP_STOSB : 1;   /* 11 Fast short REP STOSB */
+                unsigned int FAST_REP_CMPSB_SCASB : 1; /* 12 Fast short REP CMPSB/SCASB */
+                unsigned int ReservedBits2 : 4;    /* 13-16 Reserved */
+                unsigned int FRED : 1;             /* 17 Flexible Return and Event Delivery */
+                unsigned int LKGS : 1;             /* 18 LKGS */
+                unsigned int WRMSRNS : 1;          /* 19 WRMSRNS */
+                unsigned int NMI_SRC : 1;          /* 20 NMI-source reporting */
+                unsigned int AMX_FP16 : 1;         /* 21 AMX-FP16 */
                 unsigned int HRESET : 1;           /* 22 HRESET */
-                unsigned int ReservedBits3 : 9;    /* 23-31 Reserved */
+                unsigned int AVX_IFMA : 1;         /* 23 AVX-IFMA */
+                unsigned int ReservedBits3 : 2;    /* 24-25 Reserved */
+                unsigned int LAM : 1;              /* 26 Linear Address Masking */
+                unsigned int MSRLIST : 1;          /* 27 RDMSRLIST and WRMSRLIST */
+                unsigned int ReservedBits4 : 2;    /* 28-29 Reserved */
+                unsigned int INVD_DISABLE_POST_BIOS_DONE : 1; /* 30 INVD execution prevention */
+                unsigned int ReservedBits5 : 1;    /* 31 Reserved */
             };
             /* Ebx */
             struct
             {
-                unsigned int Enum_PPIN : 1;        /* 00 Enumerates the presence of the IA32_PPIN and IA32_PPIN_CTL MSRs */
-                unsigned int ReservedBits4 : 31;   /* 01-31 Reserved */
+                unsigned int PPIN : 1;             /* 00 IA32_PPIN and IA32_PPIN_CTL */
+                unsigned int PBNDKB : 1;           /* 01 PBNDKB and IA32_TSE_CAPABILITY */
+                unsigned int ReservedBits6 : 1;    /* 02 Reserved */
+                unsigned int CPUIDMAXVAL_LIM_RMV : 1; /* 03 CPUID maximum-value limiting cannot be enabled */
+                unsigned int ReservedBits7 : 28;   /* 04-31 Reserved */
             };
             /* Ecx */
-            unsigned int ReservedBits5;
+            struct
+            {
+                unsigned int RDT_M_ASYM : 1;       /* 00 Asymmetrical RDT Monitoring */
+                unsigned int RDT_A_ASYM : 1;       /* 01 Asymmetrical RDT Allocation */
+                unsigned int ReservedBits8 : 3;    /* 02-04 Reserved */
+                unsigned int MSR_IMM : 1;          /* 05 Immediate RDMSR/WRMSRNS */
+                unsigned int ReservedBits9 : 26;   /* 06-31 Reserved */
+            };
             /* Edx */
             struct
             {
-                unsigned int ReservedBits6 : 18;   /* 00-17 Reserved */
+                unsigned int ReservedBits10 : 4;   /* 00-03 Reserved */
+                unsigned int AVX_VNNI_INT8 : 1;    /* 04 AVX-VNNI-INT8 */
+                unsigned int AVX_NE_CONVERT : 1;   /* 05 AVX-NE-CONVERT */
+                unsigned int ReservedBits11 : 2;   /* 06-07 Reserved */
+                unsigned int AMX_COMPLEX : 1;      /* 08 AMX-COMPLEX */
+                unsigned int ReservedBits12 : 1;   /* 09 Reserved */
+                unsigned int AVX_VNNI_INT16 : 1;   /* 10 AVX-VNNI-INT16 */
+                unsigned int ReservedBits13 : 3;   /* 11-13 Reserved */
+                unsigned int PREFETCHI : 1;        /* 14 PREFETCHIT0/1 */
+                unsigned int USER_MSR : 1;         /* 15 URDMSR and UWRMSR */
+                unsigned int ReservedBits14 : 1;   /* 16 Reserved */
+                unsigned int UIRET_UIF : 1;        /* 17 UIRET restores UIF */
                 unsigned int CET_SSS : 1;          /* 18 CET_SSS */
-                unsigned int ReservedBits7 : 13;   /* 19-31 Reserved */
+                unsigned int AVX10 : 1;            /* 19 AVX10 and CPUID leaf 24H */
+                unsigned int ReservedBits15 : 2;   /* 20-21 Reserved */
+                unsigned int SEC_TEE_ATTESTATION : 1; /* 22 Secure TEE attestation */
+                unsigned int MWAIT : 1;            /* 23 MWAIT */
+                unsigned int SLSM : 1;             /* 24 Static LSM */
+                unsigned int ReservedBits16 : 7;   /* 25-31 Reserved */
             };
         };
     } F07_01;
+
+    struct
+    {
+        unsigned int ReservedEax;
+        unsigned int ReservedEbx;
+        unsigned int ReservedEcx;
+        struct
+        {
+            unsigned int PSFD : 1;                 /* 00 Fast Store Forwarding Predictor disable */
+            unsigned int IPRED_CTRL : 1;           /* 01 Indirect predictor controls */
+            unsigned int RRSBA_CTRL : 1;           /* 02 RRSBA controls */
+            unsigned int DDPD_U : 1;               /* 03 Data Dependent Prefetcher disable */
+            unsigned int BHI_CTRL : 1;              /* 04 BHI controls */
+            unsigned int MCDT_NO : 1;               /* 05 No MXCSR Configuration Dependent Timing */
+            unsigned int UC_LOCK_DISABLE : 1;       /* 06 UC-lock disable */
+            unsigned int MONITOR_MITG_NO : 1;       /* 07 No MONITOR/UMONITOR mitigation required */
+            unsigned int ReservedBits0 : 24;        /* 08-31 Reserved */
+        } Edx;
+    } F07_02;
 
 } CPUID_INFO, *PCPUID_INFO;
 

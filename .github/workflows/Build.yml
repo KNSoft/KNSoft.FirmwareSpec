@@ -32,8 +32,10 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\FirmwareSpecTest.exe
+        & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\AcpiDecode.exe >.\AcpiDecode.txt
         & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\CpuidDecode.exe >.\CpuidDecode.txt
         & .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\SmbiosDecode.exe >.\SmbiosDecode.txt
+        Get-Content .\AcpiDecode.txt
         Get-Content .\CpuidDecode.txt
         Get-Content .\SmbiosDecode.txt
     - name: Archive sample programs and outputs
@@ -46,6 +48,7 @@ jobs:
           .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\CpuidDecode.exe
           .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\FirmwareSpecTest.exe
           .\VSProject\OutDir\${{matrix.platform}}\${{matrix.config}}\SmbiosDecode.exe
+          .\AcpiDecode.txt
           .\CpuidDecode.txt
           .\SmbiosDecode.txt
 
@@ -61,7 +64,7 @@ jobs:
     - name: Build
       working-directory: ${{github.workspace}}
       run: |
-        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -D_LINUX -g ./SmbiosDecode.c -o SmbiosDecode
+        gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./SmbiosDecode.c -o SmbiosDecode
         gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./AcpiDecode.c -o AcpiDecode
         gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./CpuidDecode.c -o CpuidDecode
         gcc -std=gnu2x -Wall -Wextra -Werror -fdiagnostics-color=always -g ./FirmwareSpecTest.c -o FirmwareSpecTest
@@ -69,8 +72,10 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         ./FirmwareSpecTest
+        sudo ./AcpiDecode >./AcpiDecode.txt
         ./CpuidDecode >./CpuidDecode.txt
         sudo ./SmbiosDecode >./SmbiosDecode.txt
+        cat ./AcpiDecode.txt
         cat ./CpuidDecode.txt
         cat ./SmbiosDecode.txt
     - name: Archive sample programs and outputs
@@ -79,6 +84,7 @@ jobs:
         name: KNSoft.FirmwareSpec-Linux-GCC-${{github.sha}}
         path: |
           ./AcpiDecode
+          ./AcpiDecode.txt
           ./CpuidDecode
           ./CpuidDecode.txt
           ./FirmwareSpecTest
