@@ -72,7 +72,7 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         ./FirmwareSpecTest
-        sudo ./AcpiDecode >./AcpiDecode.txt
+        sudo ./AcpiDecode >./AcpiDecode.txt || { Status=$?; cat ./AcpiDecode.txt; exit $Status; }
         ./CpuidDecode >./CpuidDecode.txt
         sudo ./SmbiosDecode >./SmbiosDecode.txt
         cat ./AcpiDecode.txt
