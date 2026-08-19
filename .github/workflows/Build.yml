@@ -71,11 +71,15 @@ jobs:
     - name: Run sample programs
       working-directory: ${{github.workspace}}
       run: |
+        set -o pipefail
         ./FirmwareSpecTest
-        sudo ./AcpiDecode >./AcpiDecode.txt || { Status=$?; cat ./AcpiDecode.txt; exit $Status; }
+        if sudo test -r /sys/firmware/acpi/tables/FACP; then
+          sudo ./AcpiDecode /sys/firmware/acpi/tables/FACP | tee ./AcpiDecode.txt
+        else
+          sudo ./AcpiDecode | tee ./AcpiDecode.txt
+        fi
         ./CpuidDecode >./CpuidDecode.txt
         sudo ./SmbiosDecode >./SmbiosDecode.txt
-        cat ./AcpiDecode.txt
         cat ./CpuidDecode.txt
         cat ./SmbiosDecode.txt
     - name: Archive sample programs and outputs
