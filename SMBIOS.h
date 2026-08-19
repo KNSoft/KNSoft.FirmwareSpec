@@ -3,7 +3,7 @@
  *
  * Definitions for SMBIOS Reference Specification (DMTF DSP0134, https://www.dmtf.org/standards/smbios).
  * See the repository for more information with usage, sample and corresponding type information header.
- * Updated to SMBIOS 3.8.0.
+ * Updated to SMBIOS 3.9.0.
  *
  * Licensed under the MIT license.
  * Copyright (c) KNSoft.org (https://github.com/KNSoft). All rights reserved.
@@ -14,19 +14,24 @@
 #pragma region Preparations
 
 #include <assert.h>
+#include <stdint.h>
 
 /* Version Control */
 #ifndef SMBIOS_VERSION
-#define SMBIOS_VERSION 0x03080000 // 0x(Major)(Minor)(Revision)(WIP)
+#define SMBIOS_VERSION 0x03090000 // 0x(Major)(Minor)(Revision)(WIP)
 #endif
 static_assert(SMBIOS_VERSION >= 0x02000000);
 
 /* Basic Types */
-typedef unsigned char       UCHAR; // STRING
-typedef unsigned char       BYTE;  // UINT8
-typedef unsigned short      WORD;  // UINT16
-typedef unsigned long       DWORD; // UINT32
-typedef unsigned long long  QWORD; // UINT64
+typedef uint8_t  UCHAR; // STRING
+typedef uint8_t  BYTE;  // UINT8
+typedef uint16_t WORD;  // UINT16
+#if defined(_WIN32)
+typedef unsigned long DWORD; // UINT32; matches the Windows SDK type
+#else
+typedef uint32_t DWORD; // UINT32
+#endif
+typedef uint64_t QWORD; // UINT64
 
 /* For code analysis */
 #ifdef _MSC_VER
@@ -341,6 +346,11 @@ typedef struct _SMBIOS_BASEBOARD_INFORMATION
 #define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_TYPE_MINI_PC                 ((BYTE)0x23) // Mini PC
 #define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_TYPE_STICK_PC                ((BYTE)0x24) // Stick PC
 
+#if SMBIOS_VERSION >= 0x03090000
+#define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_RACK_TYPE_UNSPECIFIED ((BYTE)0x00)
+#define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_RACK_TYPE_OU          ((BYTE)0x01)
+#endif // SMBIOS_VERSION >= 0x03090000
+
 #define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_STATE_OTHER              ((BYTE)0x01) // Other
 #define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_STATE_UNKNOWN            ((BYTE)0x02) // Unknown
 #define SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_STATE_SAFE               ((BYTE)0x03) // Safe
@@ -390,6 +400,16 @@ typedef struct _SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS
 #endif // SMBIOS_VERSION >= 0x02030000
 #endif // SMBIOS_VERSION >= 0x02010000
 } SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS, *PSMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS, SMBIOS_TYPE_3, *PSMBIOS_TYPE_3;
+
+#if SMBIOS_VERSION >= 0x03090000
+/* Variable tail after ContainedElements. Offsets depend on ContainedElementCount and record length. */
+typedef struct _SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_TAIL_39
+{
+    UCHAR SKUNumber;   // SKU Number
+    BYTE RackType;     // Rack Type // SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_RACK_TYPE_*
+    BYTE RackHeight;   // Rack Height
+} SMBIOS_SYSTEM_ENCLOSURE_OR_CHASSIS_TAIL_39;
+#endif // SMBIOS_VERSION >= 0x03090000
 
 #pragma endregion
 
@@ -1371,7 +1391,7 @@ typedef struct _SMBIOS_SYSTEM_SLOTS
     } Characteristics2;         // Slot Characteristics 2
 #if SMBIOS_VERSION >= 0x02060000
     WORD SegmentGroupNumber;    // Segment Group Number (Base)
-    BYTE BusNumber;             // Bus Number (Base)     
+    BYTE BusNumber;             // Bus Number (Base)
     union
     {
         BYTE Value;
@@ -1636,6 +1656,10 @@ typedef struct _SMBIOS_PHYSICAL_MEMORY_ARRAY
 #define SMBIOS_MEMORY_DEVICE_FORM_FACTOR_FB_DIMM            ((BYTE)0x0F) // FB-DIMM
 #define SMBIOS_MEMORY_DEVICE_FORM_FACTOR_DIE                ((BYTE)0x10) // Die
 #define SMBIOS_MEMORY_DEVICE_FORM_FACTOR_CAMM               ((BYTE)0x11) // CAMM
+#if SMBIOS_VERSION >= 0x03090000
+#define SMBIOS_MEMORY_DEVICE_FORM_FACTOR_CUDIMM             ((BYTE)0x12) // CUDIMM
+#define SMBIOS_MEMORY_DEVICE_FORM_FACTOR_CSODIMM            ((BYTE)0x13) // CSODIMM
+#endif // SMBIOS_VERSION >= 0x03090000
 
 #define SMBIOS_MEMORY_DEVICE_TYPE_OTHER                         ((BYTE)0x01) // Other
 #define SMBIOS_MEMORY_DEVICE_TYPE_UNKNOWN                       ((BYTE)0x02) // Unknown
@@ -1670,6 +1694,9 @@ typedef struct _SMBIOS_PHYSICAL_MEMORY_ARRAY
 #define SMBIOS_MEMORY_DEVICE_TYPE_DDR5                          ((BYTE)0x22) // DDR5
 #define SMBIOS_MEMORY_DEVICE_TYPE_LPDDR5                        ((BYTE)0x23) // LPDDR5
 #define SMBIOS_MEMORY_DEVICE_TYPE_HBM3                          ((BYTE)0x24) // HBM3 (High Bandwidth Memory Generation 3)
+#if SMBIOS_VERSION >= 0x03090000
+#define SMBIOS_MEMORY_DEVICE_TYPE_MRDIMM                        ((BYTE)0x25) // MRDIMM
+#endif // SMBIOS_VERSION >= 0x03090000
 
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_OTHER                           ((BYTE)0x01) // Other
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_UNKNOWN                         ((BYTE)0x02) // Unknown
@@ -1678,7 +1705,6 @@ typedef struct _SMBIOS_PHYSICAL_MEMORY_ARRAY
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_NVDIMM_F                        ((BYTE)0x05) // NVDIMM-F
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_NVDIMM_P                        ((BYTE)0x06) // NVDIMM-P
 #define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_INTEL_OPTANE_PERSISTENT_MEMORY  ((BYTE)0x07) // Intel® Optane™ persistent memory
-#define SMBIOS_MEMORY_DEVICE_TECHNOLOGY_MRDIMM                          ((BYTE)0x08) // MRDIMM
 
 typedef struct _SMBIOS_MEMORY_DEVICE
 {
@@ -2284,7 +2310,7 @@ typedef struct _SMBIOS_64BIT_MEMORY_ERROR_INFORMATION
 
 #define SMBIOS_MANAGEMENT_DEVICE_ADDRESS_TYPE_OTHER     ((BYTE)0x01) // Other
 #define SMBIOS_MANAGEMENT_DEVICE_ADDRESS_TYPE_UNKNOWN   ((BYTE)0x02) // Unknown
-#define SMBIOS_MANAGEMENT_DEVICE_ADDRESS_TYPE_IO_PORT   ((BYTE)0x03) // I/O Port 
+#define SMBIOS_MANAGEMENT_DEVICE_ADDRESS_TYPE_IO_PORT   ((BYTE)0x03) // I/O Port
 #define SMBIOS_MANAGEMENT_DEVICE_ADDRESS_TYPE_MEMORY    ((BYTE)0x04) // Memory
 #define SMBIOS_MANAGEMENT_DEVICE_ADDRESS_TYPE_SMBUS     ((BYTE)0x05) // SM Bus
 
@@ -2449,7 +2475,7 @@ typedef struct _SMBIOS_SYSTEM_POWER_SUPPLY
     UCHAR Location;         // Location
     UCHAR DeviceName;       // Device Name
     UCHAR Manufacturer;     // Manufacturer
-    UCHAR SerialNumber;     // Serial Number 
+    UCHAR SerialNumber;     // Serial Number
     UCHAR AssetTagNumber;   // Asset Tag Number
     UCHAR ModelPartNumber;  // Model Part Number
     UCHAR RevisionLevel;    // Revision Level
@@ -2460,7 +2486,7 @@ typedef struct _SMBIOS_SYSTEM_POWER_SUPPLY
         struct
         {
             WORD HotReplaceable : 1;                // 00 Hot-replaceable // Power supply is hot-replaceable
-            WORD Present : 1;                       // 01 Present // Power supply is present 
+            WORD Present : 1;                       // 01 Present // Power supply is present
             WORD UnpluggedFromTheWall : 1;          // 02 Unplugged from the wall // Power supply is unplugged from the wall
             WORD InputVoltageRangeSwitching : 4;    // 03:06 DMTF Input Voltage Range Switching // SMBIOS_SYSTEM_POWER_SUPPLY_INPUT_VOLTAGE_RANGE_SWITCHING_*
             WORD Status : 3;                        // 07:09 Status // SMBIOS_SYSTEM_POWER_SUPPLY_STATUS_*
@@ -2623,7 +2649,7 @@ typedef struct _SMBIOS_TPM_DEVICE
 #define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_IA64         ((BYTE)0x03) // Intel® Itanium® architecture
 #define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_ARM32        ((BYTE)0x04) // 32-bit ARM (Aarch32)
 #define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_ARM64        ((BYTE)0x05) // 64-bit ARM (Aarch64)
-#define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_RISCV32      ((BYTE)0x06) // 32-bit RISC-V (RV32) 
+#define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_RISCV32      ((BYTE)0x06) // 32-bit RISC-V (RV32)
 #define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_RISCV64      ((BYTE)0x07) // 64-bit RISC-V (RV64)
 #define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_RISCV128     ((BYTE)0x08) // 128-bit RISC-V (RV128)
 #define SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_LOONGARCH32  ((BYTE)0x09) // 32-bit LoongArch (LoongArch32)
@@ -2635,6 +2661,8 @@ typedef struct _SMBIOS_PROCESSOR_SPECIFIC_BLOCK
     BYTE Type;      // Processor Type // SMBIOS_PROCESSOR_ARCHITECTURE_TYPE_*
     BYTE Data[1];   // Processor-Specific Data // _Field_size_bytes_(Length)
 } SMBIOS_PROCESSOR_SPECIFIC_BLOCK, *PSMBIOS_PROCESSOR_SPECIFIC_BLOCK;
+
+/* Architecture-specific payloads are intentionally exposed as raw bytes. */
 
 typedef struct _SMBIOS_PROCESSOR_ADDITIONAL_INFORMATION
 {

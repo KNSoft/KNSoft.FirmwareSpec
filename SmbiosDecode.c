@@ -1,5 +1,5 @@
 ﻿#include "SMBIOS.h"
-#include "SMBIOS.TypeInfo.h"
+#include "SMBIOS.Decode.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -175,14 +175,13 @@ _exit_0:
 
 #endif
 
-static const char* g_Strings[UCHAR_MAX] = { 0 };
-
 static
 PSMBIOS_TABLE
 PrintSmbiosTable(
     PSMBIOS_TABLE Table,
     void* StartOfData,
-    void* EndOfData)
+    void* EndOfData,
+    DWORD Version)
 {
     PSMBIOS_TABLE NextTable;
     void* EndOfTable;
@@ -193,6 +192,7 @@ PrintSmbiosTable(
     PSMBIOS_TYPE_INFO TypeInfo;
     QWORD BitFieldValue, Value;
     WORD BitFieldSize = 0, ValueSize;
+    const char* Strings[UCHAR_MAX] = { 0 };
 
     /* Get type information */
     TypeInfo = NULL;
@@ -211,7 +211,7 @@ PrintSmbiosTable(
     NextTable = NULL;
     while (true)
     {
-        if (psz + 2 >= (const char*)EndOfData)
+        if ((const char*)EndOfData - psz < 2)
         {
             break;
         }
@@ -227,7 +227,11 @@ PrintSmbiosTable(
         {
             break;
         }
-        g_Strings[StringCount++] = psz;
+        if (StringCount == UCHAR_MAX)
+        {
+            break;
+        }
+        Strings[StringCount++] = psz;
         psz += Length + 1;
         if (psz[0] == '\0')
         {
@@ -290,9 +294,9 @@ PrintSmbiosTable(
                        (BYTE)TypeInfo->Fields[i].Offset,
                        (BYTE)TypeInfo->Fields[i].Offset + TypeInfo->Fields[i].Size - 1,
                        TypeInfo->Fields[i].Name);
-                Value = BitFieldValue;
-                Value >>= TypeInfo->Fields[i].Offset;
-                Value &= ((QWORD)1 << TypeInfo->Fields[i].Size) - 1;
+                Value = FirmwareExtractBits(BitFieldValue,
+                                            (BYTE)TypeInfo->Fields[i].Offset,
+                                            TypeInfo->Fields[i].Size);
             }
         } else
         {
@@ -309,7 +313,7 @@ PrintSmbiosTable(
             BYTE Index = *(BYTE*)AddPtr(Table, TypeInfo->Fields[i].Offset);
             if (Index != 0 && Index <= StringCount)
             {
-                printf("0x%02hhX \"%s\"", Index, g_Strings[(BYTE)(Index - 1)]);
+                printf("0x%02hhX \"%s\"", Index, Strings[(BYTE)(Index - 1)]);
             }
         } else if (TypeInfo->Fields[i].Type == SmbiosDataTypeUInt || TypeInfo->Fields[i].Type == SmbiosDataTypeEnum)
         {
@@ -330,19 +334,19 @@ PrintSmbiosTable(
                 printf("0x%04hX", (WORD)Value);
             } else if (ValueSize == sizeof(DWORD))
             {
-                printf("0x%08lX", (DWORD)Value);
+                printf("0x%08X", (unsigned int)(DWORD)Value);
             } else if (ValueSize == sizeof(QWORD))
             {
-                printf("0x%016llX", Value);
+                printf("0x%016llX", (unsigned long long)Value);
             }
             if (TypeInfo->Fields[i].Type == SmbiosDataTypeEnum)
             {
                 WORD j;
-                for (j = 0; j < TypeInfo->Fields[i].AdditionalInfo.Enum.Count; j++)
+                for (j = 0; j < TypeInfo->Fields[i].Enum.Count; j++)
                 {
-                    if (TypeInfo->Fields[i].AdditionalInfo.Enum.Values[j].Value == Value)
+                    if (TypeInfo->Fields[i].Enum.Values[j].Value == Value)
                     {
-                        printf(" (%s)", (const char*)TypeInfo->Fields[i].AdditionalInfo.Enum.Values[j].Name);
+                        printf(" (%s)", TypeInfo->Fields[i].Enum.Values[j].Name);
                         break;
                     }
                 }
@@ -362,9 +366,17 @@ PrintSmbiosTable(
         } else if (TypeInfo->Fields[i].Type == SmbiosDataTypeUuid && TypeInfo->Fields[i].Size == 16)
         {
             BYTE* Uuid = (BYTE*)AddPtr(Table, TypeInfo->Fields[i].Offset);
-            printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-                   Uuid[0], Uuid[1], Uuid[2], Uuid[3], Uuid[4], Uuid[5], Uuid[6], Uuid[7],
-                   Uuid[8], Uuid[9], Uuid[10], Uuid[11], Uuid[12], Uuid[13], Uuid[14], Uuid[15]);
+            if (Version >= 0x02060000)
+            {
+                printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                       Uuid[3], Uuid[2], Uuid[1], Uuid[0], Uuid[5], Uuid[4], Uuid[7], Uuid[6],
+                       Uuid[8], Uuid[9], Uuid[10], Uuid[11], Uuid[12], Uuid[13], Uuid[14], Uuid[15]);
+            } else
+            {
+                printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                       Uuid[0], Uuid[1], Uuid[2], Uuid[3], Uuid[4], Uuid[5], Uuid[6], Uuid[7],
+                       Uuid[8], Uuid[9], Uuid[10], Uuid[11], Uuid[12], Uuid[13], Uuid[14], Uuid[15]);
+            }
         }
         putchar('\n');
     }
@@ -378,7 +390,10 @@ int
 main()
 {
     PSMBIOS_RAW_DATA Data;
-    PSMBIOS_TABLE Table;
+    FIRMWARE_BUFFER Buffer;
+    SMBIOS_STRUCTURE_VIEW View;
+    FIRMWARE_DECODE_STATUS Status;
+    size_t Offset;
 
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
@@ -392,12 +407,21 @@ main()
     }
     printf("SMBIOS Version: %hhu.%hhu\n", Data->SMBIOSMajorVersion, Data->SMBIOSMinorVersion);
     printf("DMI Revision: %hhu\n", Data->DmiRevision);
-    printf("Data Size: %lu bytes\n\n", Data->Length);
-    Table = (PSMBIOS_TABLE)Data->SMBIOSTableData;
-    do
+    printf("Data Size: %u bytes\n\n", (unsigned int)Data->Length);
+    Buffer.Data = Data->SMBIOSTableData;
+    Buffer.Size = Data->Length;
+    Offset = 0;
+    while ((Status = SmbiosNextStructure(&Buffer, &Offset, &View)) == FirmwareDecodeSuccess)
     {
-        Table = PrintSmbiosTable(Table, Data->SMBIOSTableData, AddPtr(Data->SMBIOSTableData, Data->Length));
-    } while (Table != NULL);
+        PrintSmbiosTable((PSMBIOS_TABLE)View.Header,
+                         Data->SMBIOSTableData,
+                         AddPtr(View.Header, View.TotalSize),
+                         (DWORD)Data->SMBIOSMajorVersion << 24 | (DWORD)Data->SMBIOSMinorVersion << 16);
+    }
+    if (Status != FirmwareDecodeEnd)
+    {
+        printf("Invalid SMBIOS data at offset 0x%zX, status %u\n", Offset, Status);
+    }
     free(Data);
     return 0;
 }

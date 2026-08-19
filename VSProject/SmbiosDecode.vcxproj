@@ -30,6 +30,8 @@
     <ClCompile Include="..\SmbiosDecode.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\FirmwareDecode.h" />
+    <ClInclude Include="..\SMBIOS.Decode.h" />
     <ClInclude Include="..\SMBIOS.h" />
     <ClInclude Include="..\SMBIOS.TypeInfo.h" />
   </ItemGroup>
